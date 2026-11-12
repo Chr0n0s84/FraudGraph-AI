@@ -11,7 +11,13 @@ import {
   Settings,
   Radio,
   X,
-  Sparkles
+  Sparkles,
+  Volume2,
+  VolumeX,
+  HelpCircle,
+  CheckCircle2,
+  ArrowRight,
+  Compass
 } from 'lucide-react';
 import type {
   DashboardSummary,
@@ -46,8 +52,32 @@ export function App() {
   const [investigatorAccountId, setInvestigatorAccountId] = useState<number | undefined>(undefined);
   const [selectedCaseId, setSelectedCaseId] = useState<number | undefined>(undefined);
 
-  // Simulator status
+  // Simulator status & Audio Telemetry
   const [isSimulating, setIsSimulating] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showJudgeTour, setShowJudgeTour] = useState(false);
+
+  // Synthesize Cybernetic Audio Alert Chime (Web Audio API)
+  const playAlertTone = useCallback(() => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.32);
+    } catch {
+      // Audio playback restrictions fallback
+    }
+  }, []);
 
   // Initial Data Fetch
   const loadInitialData = useCallback(async () => {
@@ -82,7 +112,10 @@ export function App() {
 
   const handleLiveAlert = useCallback((alert: Alert) => {
     setAlerts((prev) => [alert, ...prev]);
-  }, []);
+    if (soundEnabled && alert.severity === 'CRITICAL') {
+      playAlertTone();
+    }
+  }, [soundEnabled, playAlertTone]);
 
   const { isConnected, toastMessage, dismissToast } = useWebSocketStream(
     handleLiveTransaction,
@@ -349,20 +382,6 @@ export function App() {
           />
         )}
       </main>
-
-      {/* Status Bar Footer */}
-      <footer className="bg-slate-950/60 backdrop-blur-2xl border-t border-white/10 py-3.5 px-6 text-xs font-mono text-slate-400 flex flex-wrap items-center justify-between gap-4 mt-auto">
-        <div className="flex items-center gap-4">
-          <span className="font-bold text-slate-200">FRAUDGRAPH AI v1.0.0</span>
-          <span>•</span>
-          <span>FastAPI + NetworkX + Scikit-Learn + React + Tailwind</span>
-          <span>•</span>
-          <span className="text-cyan-400">Glassmorphic Cyber Defense UI</span>
-        </div>
-        <div className="text-slate-400">
-          Strictly for Demonstration • Synthetic Banking Ecosystem
-        </div>
-      </footer>
     </div>
   );
 }
