@@ -98,7 +98,7 @@ export function NetworkGraph({
     }
   }, [selectedAccountId, filteredData]);
 
-  // Custom node canvas renderer matching Obsidian Forensics specs
+  // Custom node canvas renderer matching FraudGraph AI specs
   const drawNode = useCallback(
     (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
       // Guard against non-finite or uninitialized coordinates from force simulation

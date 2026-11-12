@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   getTransactions,
   getAlerts,
@@ -12,6 +12,8 @@ import {
   getStats,
   freezeAccount,
   escalateAccount,
+  isOfflineMode,
+  subscribeOfflineMode,
 } from './api.js';
 import { Transaction, Alert, GraphData, AccountDossier, Stats } from './types.ts';
 import { Header } from './components/Header.tsx';
@@ -31,6 +33,11 @@ export default function App() {
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isOffline, setIsOffline] = useState<boolean>(() => isOfflineMode());
+  const [newTxIds, setNewTxIds] = useState<Set<string>>(() => new Set());
+  const knownTxIdsRef = useRef<Set<string>>(new Set());
+  const hasLoadedTxRef = useRef<boolean>(false);
+  const flashTimersRef = useRef<number[]>([]);
   const [isDrawerLoading, setIsDrawerLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'graph' | 'transactions' | 'alerts' | 'analytics'>('graph');
   const [riskFilter, setRiskFilter] = useState<'all' | 'high' | 'suspicious' | 'normal'>('all');
@@ -38,6 +45,39 @@ export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(
     () => (typeof window !== 'undefined' ? window.innerWidth < 1024 : false)
   );
+
+  const applyTransactions = useCallback((txRes: Transaction[]) => {
+    if (!hasLoadedTxRef.current) {
+      knownTxIdsRef.current = new Set(txRes.map((tx) => tx.id));
+      hasLoadedTxRef.current = true;
+      setTransactions(txRes);
+      return;
+    }
+
+    const arrivedIds = txRes
+      .filter((tx) => !knownTxIdsRef.current.has(tx.id))
+      .map((tx) => tx.id);
+
+    if (arrivedIds.length > 0) {
+      arrivedIds.forEach((id) => knownTxIdsRef.current.add(id));
+      setNewTxIds((prev) => {
+        const next = new Set(prev);
+        arrivedIds.forEach((id) => next.add(id));
+        return next;
+      });
+
+      const timerId = window.setTimeout(() => {
+        setNewTxIds((prev) => {
+          const next = new Set(prev);
+          arrivedIds.forEach((id) => next.delete(id));
+          return next;
+        });
+      }, 1800);
+      flashTimersRef.current.push(timerId);
+    }
+
+    setTransactions(txRes);
+  }, []);
 
   // Load all initial data via api.js
   const loadData = useCallback(async () => {
@@ -51,18 +91,62 @@ export default function App() {
       ]);
       setStats(statsRes);
       setGraphData(graphRes);
-      setTransactions(txRes);
+      applyTransactions(txRes);
       setAlerts(alertsRes);
     } catch (err) {
       console.error('Failed to load forensic data from api.js:', err);
     } finally {
       setIsLoading(false);
     }
+  }, [applyTransactions]);
+
+  useEffect(() => {
+    setIsOffline(isOfflineMode());
+    return subscribeOfflineMode(setIsOffline);
   }, []);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Poll getTransactions, getAlerts, and getStats every 2s
+  useEffect(() => {
+    let isMounted = true;
+    let isPolling = false;
+
+    const poll = async () => {
+      if (isPolling) return;
+      isPolling = true;
+      try {
+        const [txRes, alertsRes, statsRes] = await Promise.all([
+          getTransactions(50),
+          getAlerts(),
+          getStats(),
+        ]);
+        if (!isMounted) return;
+        applyTransactions(txRes);
+        setAlerts(alertsRes);
+        setStats(statsRes);
+      } catch (err) {
+        console.error('Failed to poll forensic telemetry from api.js:', err);
+      } finally {
+        isPolling = false;
+      }
+    };
+
+    const intervalId = window.setInterval(poll, 2000);
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, [applyTransactions]);
+
+  useEffect(() => {
+    return () => {
+      flashTimersRef.current.forEach((id) => clearTimeout(id));
+      flashTimersRef.current = [];
+    };
+  }, []);
 
   // Select and drill down to account
   const handleSelectAccount = useCallback(async (accountId: string) => {
@@ -133,6 +217,7 @@ export default function App() {
       <Header
         stats={stats}
         isLoading={isLoading}
+        isOffline={isOffline}
         onRefresh={loadData}
         onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         isSidebarCollapsed={isSidebarCollapsed}
@@ -172,6 +257,7 @@ export default function App() {
           {activeTab === 'transactions' && (
             <TransactionsTable
               transactions={transactions}
+              newTxIds={newTxIds}
               onSelectAccount={handleSelectAccount}
             />
           )}

@@ -90,3 +90,22 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #00f2fe;
 }
+
+@keyframes rowFlash {
+  0% {
+    background-color: rgba(0, 242, 254, 0.38);
+    box-shadow: inset 3px 0 0 #00f2fe;
+  }
+  50% {
+    background-color: rgba(0, 242, 254, 0.16);
+    box-shadow: inset 3px 0 0 #00f2fe;
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: inset 3px 0 0 transparent;
+  }
+}
+
+.animate-row-flash {
+  animation: rowFlash 1.8s ease-out;
+}

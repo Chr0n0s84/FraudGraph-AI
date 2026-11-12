@@ -5,12 +5,13 @@ import { ShieldAlertIcon, ActivityIcon, RefreshCwIcon, NetworkIcon } from './Ico
 interface HeaderProps {
   stats: Stats | null;
   isLoading: boolean;
+  isOffline?: boolean;
   onRefresh: () => void;
   onToggleSidebar?: () => void;
   isSidebarCollapsed?: boolean;
 }
 
-export function Header({ stats, isLoading, onRefresh, onToggleSidebar, isSidebarCollapsed }: HeaderProps) {
+export function Header({ stats, isLoading, isOffline = false, onRefresh, onToggleSidebar, isSidebarCollapsed }: HeaderProps) {
   return (
     <header className="border-b border-[rgba(56,189,248,0.14)] bg-[#080d1a]/95 backdrop-blur-md px-4 py-2.5 z-30 sticky top-0">
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
@@ -32,11 +33,16 @@ export function Header({ stats, isLoading, onRefresh, onToggleSidebar, isSidebar
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-display font-bold text-base tracking-wider text-[#f8fafc]">
-                  OBSIDIAN <span className="text-[#00f2fe]">FORENSICS</span>
+                  FRAUDGRAPH <span className="text-[#00f2fe]">AI</span>
                 </span>
                 <span className="font-mono-data text-[10px] px-1.5 py-0.5 rounded bg-[rgba(0,242,254,0.12)] text-[#00f2fe] border border-[rgba(0,242,254,0.3)]">
                   v2.4-PROD
                 </span>
+                {isOffline && (
+                  <span className="font-mono-data text-[10px] px-1.5 py-0.5 rounded bg-[rgba(245,158,11,0.16)] text-[#f59e0b] border border-[rgba(245,158,11,0.4)] font-semibold tracking-wider">
+                    OFFLINE MODE
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2 text-xs text-[#94a3b8] font-mono-data">
                 <span className="inline-block w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />

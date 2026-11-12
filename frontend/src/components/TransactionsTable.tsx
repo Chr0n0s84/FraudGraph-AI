@@ -4,10 +4,11 @@ import { SearchIcon, ArrowRightIcon, FileTextIcon, FilterIcon } from './Icons.ts
 
 interface TransactionsTableProps {
   transactions: Transaction[];
+  newTxIds?: Set<string>;
   onSelectAccount: (accountId: string) => void;
 }
 
-export function TransactionsTable({ transactions, onSelectAccount }: TransactionsTableProps) {
+export function TransactionsTable({ transactions, newTxIds, onSelectAccount }: TransactionsTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | TransactionStatus>('all');
   const [sortBy, setSortBy] = useState<'time' | 'amount'>('time');
@@ -144,11 +145,15 @@ export function TransactionsTable({ transactions, onSelectAccount }: Transaction
             <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
               {filteredTransactions.map((tx, idx) => {
                 const isEven = idx % 2 === 0;
+                const isNew = newTxIds?.has(tx.id) ?? false;
                 return (
                   <tr
                     key={tx.id}
-                    className={`transition-colors duration-150 border-l-2 border-l-transparent hover:border-l-[#00f2fe] hover:bg-[#0f1c3f] ${
-                      isEven ? 'bg-[#080d1a]' : 'bg-[#0b1329]'
+                    data-new={isNew ? 'true' : undefined}
+                    className={`transition-colors duration-150 border-l-2 hover:border-l-[#00f2fe] hover:bg-[#0f1c3f] ${
+                      isNew
+                        ? 'animate-row-flash border-l-[#00f2fe] bg-[rgba(0,242,254,0.18)]'
+                        : `border-l-transparent ${isEven ? 'bg-[#080d1a]' : 'bg-[#0b1329]'}`
                     }`}
                   >
                     {/* Tx ID */}
