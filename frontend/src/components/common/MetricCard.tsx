@@ -21,47 +21,58 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   variant = 'default',
   trend,
 }) => {
-  let borderHover = 'hover:border-cyan-500/50';
-  let iconBg = 'bg-cyber-800 text-cyan-400 border-cyan-500/30';
-  let glowStyle = '';
+  let glowGradient = 'from-cyan-500/10 via-transparent to-transparent';
+  let iconBg = 'bg-cyan-950/60 text-cyan-400 border-cyan-500/30 shadow-[0_0_15px_rgba(0,242,254,0.2)]';
+  let borderHover = 'hover:border-cyan-400/40 hover:shadow-[0_8px_30px_rgba(0,242,254,0.12)]';
 
   if (variant === 'red') {
-    borderHover = 'hover:border-rose-500/60';
-    iconBg = 'bg-rose-950/60 text-rose-400 border-rose-500/40';
-    glowStyle = 'hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]';
+    glowGradient = 'from-rose-500/15 via-rose-950/10 to-transparent';
+    iconBg = 'bg-rose-950/70 text-rose-400 border-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.25)]';
+    borderHover = 'hover:border-rose-400/50 hover:shadow-[0_8px_30px_rgba(244,63,94,0.15)]';
   } else if (variant === 'cyan') {
-    borderHover = 'hover:border-cyan-400/60';
-    iconBg = 'bg-cyan-950/60 text-cyan-400 border-cyan-500/40';
-    glowStyle = 'hover:shadow-[0_0_20px_rgba(0,242,254,0.15)]';
+    glowGradient = 'from-cyan-500/15 via-blue-950/10 to-transparent';
+    iconBg = 'bg-cyan-950/70 text-cyan-400 border-cyan-400/40 shadow-[0_0_15px_rgba(0,242,254,0.25)]';
+    borderHover = 'hover:border-cyan-400/50 hover:shadow-[0_8px_30px_rgba(0,242,254,0.15)]';
   } else if (variant === 'amber') {
-    borderHover = 'hover:border-amber-500/60';
-    iconBg = 'bg-amber-950/60 text-amber-400 border-amber-500/40';
-    glowStyle = 'hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]';
+    glowGradient = 'from-amber-500/15 via-amber-950/10 to-transparent';
+    iconBg = 'bg-amber-950/70 text-amber-400 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.2)]';
+    borderHover = 'hover:border-amber-400/50 hover:shadow-[0_8px_30px_rgba(245,158,11,0.15)]';
   } else if (variant === 'emerald') {
-    borderHover = 'hover:border-emerald-500/60';
-    iconBg = 'bg-emerald-950/60 text-emerald-400 border-emerald-500/40';
-    glowStyle = 'hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]';
+    glowGradient = 'from-emerald-500/15 via-emerald-950/10 to-transparent';
+    iconBg = 'bg-emerald-950/70 text-emerald-400 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]';
+    borderHover = 'hover:border-emerald-400/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.15)]';
   }
 
   return (
-    <div className={`bg-cyber-900/90 border border-cyber-border rounded-xl p-5 transition-all duration-300 ${borderHover} ${glowStyle} relative overflow-hidden backdrop-blur-md`}>
-      <div className="flex items-start justify-between">
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-xl border border-white/10 p-5 transition-all duration-300 frost-shine ${borderHover}`}>
+      {/* Ambient background light orb */}
+      <div className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${glowGradient} rounded-full blur-2xl pointer-events-none`} />
+
+      <div className="relative z-10 flex items-start justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wider font-mono text-slate-400 mb-1">{title}</p>
-          <h3 className="text-2xl font-bold font-mono text-slate-100 tracking-tight">{value}</h3>
-          {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+          <p className="text-[11px] uppercase tracking-wider font-mono text-slate-400 font-semibold mb-1">
+            {title}
+          </p>
+          <h3 className="text-2xl font-bold font-mono tracking-tight text-white drop-shadow-sm">
+            {value}
+          </h3>
+          {subtitle && (
+            <p className="text-[11px] text-slate-400 mt-1 font-sans">{subtitle}</p>
+          )}
         </div>
-        <div className={`w-11 h-11 rounded-lg border flex items-center justify-center p-2.5 ${iconBg}`}>
+        <div className={`w-11 h-11 rounded-xl border flex items-center justify-center p-2.5 backdrop-blur-md ${iconBg}`}>
           <Icon className="w-full h-full" />
         </div>
       </div>
 
       {trend && (
-        <div className="mt-3 pt-3 border-t border-cyber-800/80 flex items-center text-xs">
-          <span className={`font-mono font-medium ${trend.isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+        <div className="relative z-10 mt-3 pt-3 border-t border-white/[0.06] flex items-center text-xs">
+          <span className={`font-mono font-bold px-1.5 py-0.5 rounded ${
+            trend.isPositive ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-500/30' : 'text-rose-300 bg-rose-950/60 border border-rose-500/30'
+          }`}>
             {trend.value}
           </span>
-          <span className="text-slate-500 ml-1.5 font-sans">vs previous period</span>
+          <span className="text-slate-400 ml-2 font-sans text-[11px]">vs previous cycle</span>
         </div>
       )}
     </div>

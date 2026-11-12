@@ -75,3 +75,4 @@ async def websocket_live_stream(websocket: WebSocket):
     except Exception as e:
         logger.warning(f"WebSocket connection closed with error: {e}")
         ws_manager.disconnect(websocket)
+

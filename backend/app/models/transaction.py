@@ -27,3 +27,4 @@ class Transaction(Base):
     detection_reasons = Column(Text, nullable=True)  # JSON or comma-separated explanation
     
     timestamp = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+

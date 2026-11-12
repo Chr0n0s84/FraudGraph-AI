@@ -64,3 +64,4 @@ def update_settings(data: SettingsUpdate, db: Session = Depends(get_db)):
 
     db.commit()
     return {"status": "success", "message": "Detection thresholds and weights updated."}
+

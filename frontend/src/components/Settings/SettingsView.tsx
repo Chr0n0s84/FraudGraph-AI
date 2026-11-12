@@ -6,12 +6,9 @@ import {
   Save,
   CheckCircle2,
   ShieldCheck,
-  Cpu,
-  Network,
-  Zap,
-  Activity
+  Cpu
 } from 'lucide-react';
-import { SystemSettings } from '../../types';
+import type { SystemSettings } from '../../types';
 import { api } from '../../services/api';
 
 interface SettingsViewProps {
@@ -65,11 +62,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
   return (
     <div className="space-y-6 animate-fadeIn pb-12 max-w-4xl">
       {/* Top Header */}
-      <div className="bg-cyber-900 border border-cyber-border rounded-xl p-5 flex items-center justify-between">
+      <div className="rounded-2xl bg-gradient-to-r from-slate-900/60 via-slate-900/40 to-slate-950/60 backdrop-blur-2xl border border-white/10 p-5 shadow-glass flex items-center justify-between">
         <div>
           <h2 className="text-base font-bold font-mono text-slate-100 flex items-center gap-2">
             <Settings className="w-5 h-5 text-cyan-400" />
-            Detection Engine Configuration & Thresholds
+            Detection Engine Configuration & Calibration
           </h2>
           <p className="text-xs text-slate-400 font-mono mt-1">
             Tune scoring weights, heuristic toggles, and streaming simulator intervals
@@ -77,15 +74,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
         </div>
 
         {saveSuccess && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/50 animate-bounce">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Parameters Saved
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 animate-bounce shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Parameters Applied
           </span>
         )}
       </div>
 
       <form onSubmit={handleSave} className="space-y-6 font-mono text-xs">
         {/* Risk Thresholds Card */}
-        <div className="bg-cyber-900 border border-cyber-border rounded-xl p-5 space-y-4">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass space-y-4">
           <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider text-cyan-400 flex items-center gap-2">
             <Sliders className="w-4 h-4" />
             1. Classification Score Thresholds
@@ -140,14 +137,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
         </div>
 
         {/* Scoring Factor Weights Card */}
-        <div className="bg-cyber-900 border border-cyber-border rounded-xl p-5 space-y-4">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass space-y-4">
           <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider text-cyan-400 flex items-center gap-2">
             <Cpu className="w-4 h-4" />
             2. Multi-Factor Scoring Weights
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-cyber-950 p-3.5 rounded-xl border border-cyber-border space-y-1.5">
+            <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 space-y-1.5 backdrop-blur-md">
               <div className="flex justify-between text-slate-300">
                 <span>AML Typology Rules Weight</span>
                 <span className="text-cyan-400 font-bold">{(settings.weight_rules * 100).toFixed(0)}%</span>
@@ -163,7 +160,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
               />
             </div>
 
-            <div className="bg-cyber-950 p-3.5 rounded-xl border border-cyber-border space-y-1.5">
+            <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 space-y-1.5 backdrop-blur-md">
               <div className="flex justify-between text-slate-300">
                 <span>Graph Centrality & Topology Weight</span>
                 <span className="text-cyan-400 font-bold">{(settings.weight_graph * 100).toFixed(0)}%</span>
@@ -179,7 +176,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
               />
             </div>
 
-            <div className="bg-cyber-950 p-3.5 rounded-xl border border-cyber-border space-y-1.5">
+            <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 space-y-1.5 backdrop-blur-md">
               <div className="flex justify-between text-slate-300">
                 <span>ML Isolation Forest Anomaly Weight</span>
                 <span className="text-cyan-400 font-bold">{(settings.weight_ml * 100).toFixed(0)}%</span>
@@ -195,7 +192,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
               />
             </div>
 
-            <div className="bg-cyber-950 p-3.5 rounded-xl border border-cyber-border space-y-1.5">
+            <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 space-y-1.5 backdrop-blur-md">
               <div className="flex justify-between text-slate-300">
                 <span>Transaction Velocity Burst Weight</span>
                 <span className="text-cyan-400 font-bold">{(settings.weight_velocity * 100).toFixed(0)}%</span>
@@ -214,13 +211,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
         </div>
 
         {/* Rule Active Toggles Card */}
-        <div className="bg-cyber-900 border border-cyber-border rounded-xl p-5 space-y-4">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass space-y-4">
           <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider text-cyan-400 flex items-center gap-2">
             <ShieldCheck className="w-4 h-4" />
             3. Regulatory Typology Detection Toggles
           </h3>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {[
               { key: 'enable_circular_rule', label: 'Circular Money Laundering Layering Loop Detection' },
               { key: 'enable_fan_in_rule', label: 'Fan-In Collector Funnel Mule Detection' },
@@ -230,14 +227,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
             ].map((rule) => (
               <label
                 key={rule.key}
-                className="flex items-center justify-between p-3 rounded-lg bg-cyber-950 border border-cyber-border cursor-pointer hover:border-slate-600 transition-colors"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.03] border border-white/10 cursor-pointer hover:border-slate-500 transition-colors backdrop-blur-md"
               >
                 <span className="text-slate-200">{rule.label}</span>
                 <input
                   type="checkbox"
                   checked={(settings as any)[rule.key]}
                   onChange={(e) => setSettings({ ...settings, [rule.key]: e.target.checked } as any)}
-                  className="rounded bg-cyber-900 border-cyber-border text-cyan-500 focus:ring-0"
+                  className="rounded bg-slate-900 border-white/20 text-cyan-500 focus:ring-0"
                 />
               </label>
             ))}
@@ -245,12 +242,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
         </div>
 
         {/* Simulator Interval & Reset Benchmark Data */}
-        <div className="bg-cyber-900 border border-cyber-border rounded-xl p-5 flex flex-wrap items-center justify-between gap-4">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h4 className="text-xs uppercase tracking-wider text-slate-300 font-bold mb-1">
+            <h4 className="text-xs uppercase tracking-wider text-slate-200 font-bold mb-1">
               Synthetic Benchmark Reset
             </h4>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-slate-400">
               Restore clean deterministic dataset with 4 fraud rings & 140+ benchmark transactions
             </p>
           </div>
@@ -258,7 +255,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
           <button
             type="button"
             onClick={onResetData}
-            className="px-4 py-2 rounded-lg border border-rose-500/50 text-rose-300 bg-rose-950/60 hover:bg-rose-900 transition-colors flex items-center gap-1.5"
+            className="px-4 py-2 rounded-xl border border-rose-500/50 text-rose-300 bg-rose-950/60 hover:bg-rose-900 transition-colors flex items-center gap-1.5 shadow-[0_0_15px_rgba(244,63,94,0.2)]"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Reset to Deterministic Benchmark
@@ -270,7 +267,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onResetData }) => {
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2.5 rounded-xl font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-all flex items-center gap-2"
+            className="px-6 py-2.5 rounded-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 text-slate-950 shadow-[0_0_20px_rgba(0,242,254,0.3)] transition-all flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : 'Apply & Save Settings'}

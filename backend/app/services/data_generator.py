@@ -565,3 +565,4 @@ def seed_synthetic_database(db: Session, seed: int = 42):
 
     db.commit()
     logger.info(f"Synthetic financial ecosystem seeded successfully: {len(accounts)} accounts, {len(transactions)} transactions, {len(alerts)} alerts, {2} cases.")
+

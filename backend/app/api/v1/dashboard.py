@@ -94,3 +94,4 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
         pattern_breakdown=patterns,
         top_suspicious_accounts=top_list
     )
+

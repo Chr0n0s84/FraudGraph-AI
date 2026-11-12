@@ -39,3 +39,4 @@ class EgoGraphRequest(BaseModel):
     account_id: int
     hops: int = 2
     min_amount: Optional[float] = 0.0
+

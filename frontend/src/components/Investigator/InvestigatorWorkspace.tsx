@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Search,
-  UserCheck,
-  ShieldAlert,
   ArrowDownLeft,
   ArrowUpRight,
   Network,
@@ -10,13 +8,10 @@ import {
   AlertTriangle,
   Lock,
   Unlock,
-  FileText,
-  DollarSign,
   Plus
 } from 'lucide-react';
-import { AccountDetail, Transaction, NetworkGraphData } from '../../types';
+import type { AccountDetail, Transaction, NetworkGraphData } from '../../types';
 import { RiskBadge } from '../common/RiskBadge';
-import { StatusBadge } from '../common/StatusBadge';
 import { api } from '../../services/api';
 
 interface InvestigatorWorkspaceProps {
@@ -27,7 +22,6 @@ interface InvestigatorWorkspaceProps {
 
 export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
   initialAccountId,
-  onNavigateToCase,
   onCreateCaseForAccount,
 }) => {
   const [searchIdOrNum, setSearchIdOrNum] = useState<string>(
@@ -65,7 +59,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
       setSearchIdOrNum(String(initialAccountId));
       fetchDossier(initialAccountId);
     } else {
-      fetchDossier(51); // default to Circular ring leader Klaus Becker
+      fetchDossier(51);
     }
   }, [initialAccountId]);
 
@@ -95,7 +89,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
       {/* Top Search Bar & Preset Quick Jump */}
-      <div className="bg-cyber-900 border border-cyber-border rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+      <div className="rounded-2xl bg-gradient-to-r from-slate-900/60 via-slate-900/40 to-slate-950/60 backdrop-blur-2xl border border-white/10 p-4 shadow-glass flex flex-wrap items-center justify-between gap-4">
         <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-1 min-w-[280px]">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -104,12 +98,12 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
               placeholder="Enter Account ID (e.g. 51, 64, 65, 74)..."
               value={searchIdOrNum}
               onChange={(e) => setSearchIdOrNum(e.target.value)}
-              className="w-full bg-cyber-950 border border-cyber-border rounded-lg pl-10 pr-4 py-2 text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+              className="w-full bg-slate-950/60 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs font-mono text-slate-200 placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,242,254,0.2)] backdrop-blur-md"
             />
           </div>
           <button
             type="submit"
-            className="px-4 py-2 rounded-lg text-xs font-mono font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all shadow-[0_0_12px_rgba(0,242,254,0.3)]"
+            className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 text-slate-950 transition-all shadow-[0_0_15px_rgba(0,242,254,0.3)]"
           >
             Investigate
           </button>
@@ -117,7 +111,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
 
         {/* Preset quick jump */}
         <div className="flex items-center gap-1.5 font-mono text-xs">
-          <span className="text-slate-500 text-[11px] mr-1">Quick Select:</span>
+          <span className="text-slate-400 text-[11px] mr-1">Quick Select:</span>
           {[
             { id: 51, label: 'Mule #51 (Circular)' },
             { id: 64, label: 'Mule #64 (Fan-In Collector)' },
@@ -130,7 +124,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
                 setSearchIdOrNum(String(item.id));
                 fetchDossier(item.id);
               }}
-              className="px-2.5 py-1 rounded bg-cyber-950 border border-cyber-border hover:border-cyan-400 text-slate-300 transition-colors"
+              className="px-3 py-1 rounded-xl bg-white/[0.03] border border-white/10 hover:border-cyan-400 text-slate-300 hover:text-white transition-colors"
             >
               {item.label}
             </button>
@@ -139,7 +133,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 font-mono text-xs">
+        <div className="p-4 rounded-2xl bg-rose-950/80 border border-rose-500/50 text-rose-300 font-mono text-xs shadow-glass">
           {error}
         </div>
       )}
@@ -147,19 +141,19 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
       {account && (
         <div className="space-y-6">
           {/* Dossier Header Card */}
-          <div className="bg-cyber-900 border border-cyber-border rounded-xl p-6 relative overflow-hidden">
-            <div className="flex flex-wrap items-start justify-between gap-6 pb-6 border-b border-cyber-border">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass relative overflow-hidden">
+            <div className="flex flex-wrap items-start justify-between gap-6 pb-6 border-b border-white/[0.08]">
               <div className="flex items-start gap-4">
                 <div className={`p-4 rounded-2xl border text-xl font-mono font-extrabold flex items-center justify-center w-16 h-16 ${
                   account.is_flagged
                     ? 'bg-rose-950/80 border-rose-500 text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.3)]'
-                    : 'bg-cyber-800 border-cyber-border text-cyan-400'
+                    : 'bg-slate-950/80 border-white/10 text-cyan-400 shadow-[0_0_15px_rgba(0,242,254,0.2)]'
                 }`}>
                   {account.id}
                 </div>
                 <div>
                   <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold font-mono text-slate-100">{account.holder_name}</h2>
+                    <h2 className="text-xl font-bold font-mono text-white">{account.holder_name}</h2>
                     <RiskBadge level={account.risk_level} score={account.risk_score} />
                   </div>
                   <p className="text-xs font-mono text-slate-400 mt-1">
@@ -172,7 +166,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
                     </p>
                   )}
                   {account.mule_ring_id && (
-                    <span className="inline-block mt-2 px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-rose-950 border border-rose-500 text-rose-300">
+                    <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-950/80 border border-rose-500/60 text-rose-300">
                       SYNDICATE: {account.mule_ring_id}
                     </span>
                   )}
@@ -184,19 +178,19 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
                 <button
                   disabled={togglingFlag}
                   onClick={handleToggleFlag}
-                  className={`px-4 py-2 rounded-lg font-bold flex items-center gap-1.5 border transition-all ${
+                  className={`px-4 py-2 rounded-xl font-bold flex items-center gap-1.5 border transition-all ${
                     account.is_flagged
-                      ? 'bg-amber-950 text-amber-300 border-amber-500/50 hover:bg-amber-900'
-                      : 'bg-rose-950 text-rose-300 border-rose-500/50 hover:bg-rose-900 shadow-[0_0_15px_rgba(244,63,94,0.25)]'
+                      ? 'bg-amber-950/70 text-amber-300 border-amber-500/50 hover:bg-amber-900'
+                      : 'bg-rose-950/70 text-rose-300 border-rose-500/50 hover:bg-rose-900 shadow-[0_0_15px_rgba(244,63,94,0.3)]'
                   }`}
                 >
                   {account.is_flagged ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                  {account.is_flagged ? 'Clear Account Flag' : 'Debit Freeze & Flag Mule'}
+                  {account.is_flagged ? 'Clear Account Restriction' : 'Freeze & Flag Confirmed Mule'}
                 </button>
 
                 <button
                   onClick={() => onCreateCaseForAccount(account)}
-                  className="px-4 py-2 rounded-lg font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 text-slate-950 shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-all flex items-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   Open Case
@@ -206,43 +200,43 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
 
             {/* Financial & Centrality Metrics Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 text-xs font-mono">
-              <div className="bg-cyber-950 p-3 rounded-lg border border-cyber-border">
-                <span className="text-slate-500 block text-[10px] uppercase">Current Balance</span>
-                <span className="text-slate-100 font-bold text-base">
+              <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[10px] uppercase">Current Balance</span>
+                <span className="text-white font-bold text-base">
                   ${account.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <div className="bg-cyber-950 p-3 rounded-lg border border-cyber-border">
-                <span className="text-slate-500 block text-[10px] uppercase">Total Inflow</span>
+              <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[10px] uppercase">Total Inflow</span>
                 <span className="text-emerald-400 font-bold text-base flex items-center gap-1">
                   <ArrowDownLeft className="w-3.5 h-3.5" />
                   ${account.total_inflow.toLocaleString()}
                 </span>
               </div>
-              <div className="bg-cyber-950 p-3 rounded-lg border border-cyber-border">
-                <span className="text-slate-500 block text-[10px] uppercase">Total Outflow</span>
+              <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[10px] uppercase">Total Outflow</span>
                 <span className="text-rose-400 font-bold text-base flex items-center gap-1">
                   <ArrowUpRight className="w-3.5 h-3.5" />
                   ${account.total_outflow.toLocaleString()}
                 </span>
               </div>
-              <div className="bg-cyber-950 p-3 rounded-lg border border-cyber-border">
-                <span className="text-slate-500 block text-[10px] uppercase">Counterparties</span>
-                <span className="text-slate-100 font-bold text-base">{account.connected_counterparties} peers</span>
+              <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[10px] uppercase">Counterparties</span>
+                <span className="text-slate-200 font-bold text-base">{account.connected_counterparties} peers</span>
               </div>
-              <div className="bg-cyber-950 p-3 rounded-lg border border-cyber-border">
-                <span className="text-slate-500 block text-[10px] uppercase">PageRank Centrality</span>
+              <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[10px] uppercase">PageRank Centrality</span>
                 <span className="text-cyan-400 font-bold text-base">{account.pagerank.toFixed(2)}%</span>
               </div>
-              <div className="bg-cyber-950 p-3 rounded-lg border border-cyber-border">
-                <span className="text-slate-500 block text-[10px] uppercase">Betweenness Bridge</span>
+              <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[10px] uppercase">Betweenness Bridge</span>
                 <span className="text-amber-400 font-bold text-base">{account.betweenness.toFixed(2)}%</span>
               </div>
             </div>
           </div>
 
           {/* Ego-Network Subgraph View (2-Hop) */}
-          <div className="bg-cyber-900 border border-cyber-border rounded-xl p-5">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-sm font-bold font-mono text-slate-100 flex items-center gap-2">
@@ -258,10 +252,9 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
               </span>
             </div>
 
-            <div className="h-64 bg-cyber-950 rounded-xl border border-cyber-border flex items-center justify-center overflow-hidden relative radar-grid">
+            <div className="h-64 bg-slate-950/70 rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden relative radar-grid shadow-inner">
               {egoGraph && (
                 <svg className="w-full h-full">
-                  {/* Central focal node at 50% width and height */}
                   <g transform="translate(350, 128)">
                     <circle r="22" fill="rgba(0, 242, 254, 0.2)" stroke="#00f2fe" strokeWidth="2.5" />
                     <circle r="8" fill="#00f2fe" />
@@ -270,7 +263,6 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
                     </text>
                   </g>
 
-                  {/* Satellite 1-hop nodes around focus */}
                   {egoGraph.nodes
                     .filter((n) => n.account_id !== account.id)
                     .slice(0, 10)
@@ -282,13 +274,12 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
 
                       return (
                         <g key={n.id}>
-                          {/* Directed line to center */}
                           <line
                             x1={350}
                             y1={128}
                             x2={x}
                             y2={y}
-                            stroke={isDanger ? '#f43f5e' : '#1e2e54'}
+                            stroke={isDanger ? '#f43f5e' : 'rgba(255, 255, 255, 0.15)'}
                             strokeWidth={isDanger ? 1.5 : 1}
                             strokeDasharray={isDanger ? '3 3' : undefined}
                           />
@@ -318,7 +309,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
           </div>
 
           {/* Chronological Transaction History Table */}
-          <div className="bg-cyber-900 border border-cyber-border rounded-xl p-5">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass">
             <h3 className="text-sm font-bold font-mono text-slate-100 mb-3 flex items-center gap-2">
               <Activity className="w-4 h-4 text-cyan-400" />
               Chronological Transaction Ledger
@@ -327,7 +318,7 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
                 <thead>
-                  <tr className="bg-cyber-850 border-b border-cyber-border text-slate-400 uppercase text-[11px]">
+                  <tr className="bg-white/[0.03] border-b border-white/[0.08] text-slate-400 uppercase text-[11px]">
                     <th className="py-2.5 px-3">Direction</th>
                     <th className="py-2.5 px-3">Counterparty</th>
                     <th className="py-2.5 px-3">Amount</th>
@@ -337,12 +328,12 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
                     <th className="py-2.5 px-3">Timestamp</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-cyber-border/60">
+                <tbody className="divide-y divide-white/[0.05]">
                   {transactions.map((tx) => {
                     const isOutgoing = tx.source_account_id === account.id;
 
                     return (
-                      <tr key={tx.id} className="hover:bg-cyber-850">
+                      <tr key={tx.id} className="hover:bg-white/[0.05]">
                         <td className="py-3 px-3">
                           {isOutgoing ? (
                             <span className="text-rose-400 font-bold flex items-center gap-1">
@@ -355,18 +346,18 @@ export const InvestigatorWorkspace: React.FC<InvestigatorWorkspaceProps> = ({
                           )}
                         </td>
                         <td className="py-3 px-3">
-                          <span className="text-slate-200">
+                          <span className="text-slate-100">
                             {isOutgoing ? tx.target_holder_name || `Acc #${tx.target_account_id}` : tx.source_holder_name || `Acc #${tx.source_account_id}`}
                           </span>
                         </td>
-                        <td className="py-3 px-3 font-bold text-slate-100">
+                        <td className="py-3 px-3 font-bold text-white">
                           ${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="py-3 px-3 text-slate-400">{tx.channel}</td>
+                        <td className="py-3 px-3 text-slate-300">{tx.channel}</td>
                         <td className="py-3 px-3">
                           <RiskBadge level={tx.risk_level} score={tx.risk_score} />
                         </td>
-                        <td className="py-3 px-3 text-amber-400 font-bold">
+                        <td className="py-3 px-3 text-amber-300 font-bold">
                           {tx.pattern_type || 'NORMAL'}
                         </td>
                         <td className="py-3 px-3 text-slate-400">

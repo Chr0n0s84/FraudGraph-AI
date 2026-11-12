@@ -37,3 +37,4 @@ class Settings(BaseModel):
     AUTO_SIMULATE: bool = False
 
 settings = Settings()
+

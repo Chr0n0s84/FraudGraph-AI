@@ -38,3 +38,4 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({ level, score, className = 
     </span>
   );
 };
+

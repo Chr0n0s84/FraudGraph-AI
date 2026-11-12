@@ -19,3 +19,4 @@ Write-Host "Frontend:  http://127.0.0.1:5173" -ForegroundColor White
 Write-Host "Backend:   http://127.0.0.1:8000" -ForegroundColor White
 Write-Host "API Docs:  http://127.0.0.1:8000/docs" -ForegroundColor White
 Write-Host "Press Ctrl+C or close the terminal windows to exit." -ForegroundColor Gray
+

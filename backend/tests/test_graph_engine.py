@@ -38,3 +38,4 @@ def test_fan_in_detection():
     assert len(fan_ins) == 1
     assert fan_ins[0]["account_id"] == 6
     assert fan_ins[0]["in_degree"] == 5
+

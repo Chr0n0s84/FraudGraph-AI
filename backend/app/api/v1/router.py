@@ -20,3 +20,4 @@ api_router.include_router(cases_router, prefix="/cases", tags=["Case Management"
 api_router.include_router(analytics_router, prefix="/analytics", tags=["Analytics"])
 api_router.include_router(settings_router, prefix="/settings", tags=["Settings"])
 api_router.include_router(simulator_router, prefix="/simulator", tags=["Simulator"])
+

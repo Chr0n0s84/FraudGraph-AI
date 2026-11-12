@@ -44,3 +44,4 @@ async def reset_database(seed: int = 42, db: Session = Depends(get_db)):
     seed_synthetic_database(db, seed=seed)
 
     return {"status": "success", "message": "Synthetic financial database reset and re-seeded successfully."}
+

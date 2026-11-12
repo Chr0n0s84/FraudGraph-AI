@@ -18,3 +18,4 @@ class DashboardSummaryResponse(BaseModel):
     hourly_trend: List[Dict[str, Any]]
     pattern_breakdown: Dict[str, int]
     top_suspicious_accounts: List[Dict[str, Any]]
+

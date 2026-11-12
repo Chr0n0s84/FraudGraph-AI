@@ -90,3 +90,4 @@ class CaseService:
         return note
 
 case_service = CaseService()
+

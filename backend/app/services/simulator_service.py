@@ -249,3 +249,4 @@ class SimulatorService:
             db.close()
 
 simulator_service = SimulatorService()
+

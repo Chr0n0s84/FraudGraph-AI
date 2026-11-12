@@ -30,3 +30,4 @@ def test_risk_scoring_explanation():
     assert result["is_flagged"] is True
     assert len(result["factors"]) == 4
     assert "CRITICAL" in result["explanation_summary"]
+

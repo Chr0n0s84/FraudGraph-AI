@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, ShieldAlert, Cpu, Network, Zap, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
-import { TransactionDetail } from '../../types';
+import type { TransactionDetail } from '../../types';
 import { RiskBadge } from './RiskBadge';
 import { StatusBadge } from './StatusBadge';
 
@@ -33,16 +33,16 @@ export const ExplainabilityModal: React.FC<ExplainabilityModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-cyber-900 border border-cyber-border-bright rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-fadeIn">
+      <div className="bg-slate-900/90 border border-white/20 backdrop-blur-2xl rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-cyber-border flex items-center justify-between bg-cyber-850">
+        <div className="p-5 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.02]">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-cyber-800 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2.5 rounded-2xl bg-cyan-950/70 border border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(0,242,254,0.2)]">
               <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold font-mono text-slate-100 flex items-center gap-2">
+              <h2 className="text-lg font-bold font-mono text-white flex items-center gap-2">
                 Explainable Risk Assessment
                 <RiskBadge level={transaction.risk_level} score={transaction.risk_score} />
               </h2>
@@ -53,7 +53,7 @@ export const ExplainabilityModal: React.FC<ExplainabilityModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-cyber-800 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -62,10 +62,10 @@ export const ExplainabilityModal: React.FC<ExplainabilityModalProps> = ({
         {/* Content */}
         <div className="p-6 overflow-y-auto space-y-6">
           {/* Summary Box */}
-          <div className={`p-4 rounded-xl border ${
+          <div className={`p-4 rounded-2xl border backdrop-blur-md ${
             transaction.is_flagged
-              ? 'bg-rose-950/30 border-rose-500/40 text-rose-200'
-              : 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+              ? 'bg-rose-950/40 border-rose-500/50 text-rose-200 shadow-[0_0_20px_rgba(244,63,94,0.15)]'
+              : 'bg-emerald-950/30 border-emerald-500/40 text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.1)]'
           }`}>
             <div className="flex items-start gap-3">
               {transaction.is_flagged ? (
@@ -75,7 +75,7 @@ export const ExplainabilityModal: React.FC<ExplainabilityModalProps> = ({
               )}
               <div>
                 <h4 className="text-sm font-bold font-mono uppercase tracking-wide">
-                  {transaction.is_flagged ? 'Suspicious Indicators Detected' : 'Transaction Cleared'}
+                  {transaction.is_flagged ? 'Suspicious AML Typologies Detected' : 'Transaction Cleared'}
                 </h4>
                 <p className="text-xs mt-1 leading-relaxed text-slate-300">
                   {breakdown.explanation_summary}
@@ -85,32 +85,32 @@ export const ExplainabilityModal: React.FC<ExplainabilityModalProps> = ({
           </div>
 
           {/* Transaction Metadata Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-cyber-950/60 p-4 rounded-xl border border-cyber-border font-mono text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/[0.02] p-4 rounded-2xl border border-white/10 font-mono text-xs">
             <div>
-              <span className="text-slate-500 block text-[10px] uppercase">Amount</span>
-              <span className="text-cyan-300 font-bold text-sm">
+              <span className="text-slate-400 block text-[10px] uppercase">Amount</span>
+              <span className="text-cyan-300 font-bold text-base">
                 ${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[10px] uppercase">Channel</span>
-              <span className="text-slate-200">{transaction.channel}</span>
+              <span className="text-slate-400 block text-[10px] uppercase">Channel</span>
+              <span className="text-slate-200 font-semibold">{transaction.channel}</span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[10px] uppercase">Status</span>
+              <span className="text-slate-400 block text-[10px] uppercase">Status</span>
               <StatusBadge status={transaction.status} />
             </div>
             <div>
-              <span className="text-slate-500 block text-[10px] uppercase">Pattern</span>
-              <span className="text-amber-400 font-bold">{transaction.pattern_type || 'NORMAL'}</span>
+              <span className="text-slate-400 block text-[10px] uppercase">Pattern</span>
+              <span className="text-amber-300 font-bold">{transaction.pattern_type || 'NORMAL'}</span>
             </div>
           </div>
 
           {/* Account Route Flow */}
-          <div className="bg-cyber-850 p-4 rounded-xl border border-cyber-border flex items-center justify-between text-xs font-mono">
+          <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/10 flex items-center justify-between text-xs font-mono">
             <div className="flex-1">
-              <span className="text-slate-500 text-[10px] uppercase block">Originator Account</span>
-              <p className="font-semibold text-slate-200">{transaction.source_holder_name || 'Account'}</p>
+              <span className="text-slate-400 text-[10px] uppercase block">Originator Account</span>
+              <p className="font-semibold text-slate-100">{transaction.source_holder_name || 'Account'}</p>
               <p className="text-slate-400 text-[11px]">{transaction.source_account_number || `ACC-${transaction.source_account_id}`}</p>
             </div>
             <div className="px-4 text-cyan-400 flex flex-col items-center">
@@ -118,48 +118,48 @@ export const ExplainabilityModal: React.FC<ExplainabilityModalProps> = ({
               <ArrowRight className="w-5 h-5 animate-pulse" />
             </div>
             <div className="flex-1 text-right">
-              <span className="text-slate-500 text-[10px] uppercase block">Beneficiary Account</span>
-              <p className="font-semibold text-slate-200">{transaction.target_holder_name || 'Account'}</p>
+              <span className="text-slate-400 text-[10px] uppercase block">Beneficiary Account</span>
+              <p className="font-semibold text-slate-100">{transaction.target_holder_name || 'Account'}</p>
               <p className="text-slate-400 text-[11px]">{transaction.target_account_number || `ACC-${transaction.target_account_id}`}</p>
             </div>
           </div>
 
           {/* Factor Breakdown Weights */}
           <div>
-            <h4 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+            <h4 className="text-xs uppercase font-mono tracking-wider text-slate-300 mb-3 flex items-center justify-between font-bold">
               <span>Risk Factor Decomposition</span>
-              <span className="text-slate-500 text-[11px]">Normalized Weight Contributions</span>
+              <span className="text-slate-400 text-[11px]">Normalized Weight Contributions</span>
             </h4>
             <div className="space-y-3">
               {breakdown.factors.map((factor, idx) => {
                 const Icon = getFactorIcon(factor.name);
                 const pct = Math.min(100, factor.score);
-                let barColor = 'bg-cyan-500';
-                if (pct >= 80) barColor = 'bg-rose-500';
-                else if (pct >= 60) barColor = 'bg-amber-500';
-                else if (pct >= 35) barColor = 'bg-cyan-500';
-                else barColor = 'bg-emerald-500';
+                let barColor = 'bg-cyan-400 shadow-[0_0_8px_#00f2fe]';
+                if (pct >= 80) barColor = 'bg-rose-500 shadow-[0_0_8px_#f43f5e]';
+                else if (pct >= 60) barColor = 'bg-amber-400 shadow-[0_0_8px_#f59e0b]';
+                else if (pct >= 35) barColor = 'bg-cyan-400 shadow-[0_0_8px_#00f2fe]';
+                else barColor = 'bg-emerald-400 shadow-[0_0_8px_#34d399]';
 
                 return (
-                  <div key={idx} className="bg-cyber-850/80 p-3.5 rounded-xl border border-cyber-border">
+                  <div key={idx} className="bg-white/[0.03] p-3.5 rounded-2xl border border-white/10 backdrop-blur-md">
                     <div className="flex items-center justify-between text-xs font-mono mb-2">
-                      <span className="flex items-center gap-2 text-slate-200 font-medium">
+                      <span className="flex items-center gap-2 text-slate-100 font-semibold">
                         <Icon className="w-4 h-4 text-cyan-400" />
                         {factor.name}
-                        <span className="text-[10px] text-slate-500">({factor.weight}% weight)</span>
+                        <span className="text-[10px] text-slate-400 font-normal">({factor.weight}% weight)</span>
                       </span>
-                      <span className="font-bold text-slate-100">
-                        Score: {factor.score} <span className="text-cyan-400 text-[11px] font-normal">(+{factor.contribution} pts)</span>
+                      <span className="font-bold text-white">
+                        Score: {factor.score} <span className="text-cyan-300 text-[11px] font-normal">(+{factor.contribution} pts)</span>
                       </span>
                     </div>
                     {/* Progress Bar */}
-                    <div className="h-1.5 w-full bg-cyber-950 rounded-full overflow-hidden mb-2">
+                    <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden mb-2">
                       <div
                         className={`h-full ${barColor} rounded-full transition-all duration-500`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <p className="text-[11px] text-slate-400 font-sans">{factor.details}</p>
+                    <p className="text-[11px] text-slate-300 font-sans">{factor.details}</p>
                   </div>
                 );
               })}
@@ -168,21 +168,21 @@ export const ExplainabilityModal: React.FC<ExplainabilityModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-cyber-border bg-cyber-850 flex items-center justify-between">
-          <span className="text-xs text-slate-500 font-mono">
-            Algorithm: Ensemble Heuristic + Isolation Forest + NetworkX
+        <div className="p-4 border-t border-white/[0.08] bg-white/[0.02] flex items-center justify-between">
+          <span className="text-xs text-slate-400 font-mono">
+            Model: Ensemble Isolation Forest + Graph Centrality DFS
           </span>
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg text-xs font-mono font-medium text-slate-300 hover:bg-cyber-800 border border-cyber-border transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-mono font-medium text-slate-300 hover:text-white hover:bg-white/[0.06] border border-white/10 transition-colors"
             >
-              Close
+              Dismiss
             </button>
             {transaction.is_flagged && onEscalate && (
               <button
                 onClick={() => onEscalate(transaction)}
-                className="px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all flex items-center gap-1.5"
               >
                 <ShieldAlert className="w-4 h-4" />
                 Escalate to Case

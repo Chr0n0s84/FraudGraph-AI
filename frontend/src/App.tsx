@@ -3,21 +3,17 @@ import {
   ShieldAlert,
   Activity,
   Network,
-  Cpu,
   Sliders,
   AlertOctagon,
   Search,
   FolderKanban,
   BarChart3,
   Settings,
-  Bell,
   Radio,
   X,
-  Play,
-  Pause,
-  ExternalLink
+  Sparkles
 } from 'lucide-react';
-import {
+import type {
   DashboardSummary,
   Transaction,
   Alert,
@@ -81,7 +77,6 @@ export function App() {
   // WebSocket Live Stream Handlers
   const handleLiveTransaction = useCallback((tx: Transaction) => {
     setTransactions((prev) => [tx, ...prev.slice(0, 70)]);
-    // Refresh summary metrics periodically
     api.getDashboardSummary().then(setSummary).catch(() => {});
   }, []);
 
@@ -124,7 +119,6 @@ export function App() {
     }
   };
 
-  // Cross-Module Deep Navigation Handlers
   const handleNavigateToInvestigator = (accountId: number) => {
     setInvestigatorAccountId(accountId);
     setActiveTab('investigator');
@@ -180,64 +174,71 @@ export function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-cyber-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Toast Notification for Real-Time High/Critical Alerts */}
+    <div className="relative min-h-screen text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+      {/* Dynamic Ambient Background Glows */}
+      <div className="fixed top-0 left-1/4 w-[600px] h-[400px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse-slow" />
+      <div className="fixed top-1/3 right-10 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none -z-10" />
+      <div className="fixed bottom-10 left-10 w-[600px] h-[450px] bg-rose-600/08 rounded-full blur-[160px] pointer-events-none -z-10" />
+
+      {/* Floating Alert Toast */}
       {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-rose-950 border border-rose-500 text-rose-200 p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce">
-          <AlertOctagon className="w-5 h-5 text-rose-400 shrink-0" />
-          <span className="text-xs font-mono font-semibold">{toastMessage}</span>
+        <div className="fixed top-6 right-6 z-50 bg-rose-950/80 border border-rose-500/60 backdrop-blur-2xl text-rose-100 px-5 py-4 rounded-2xl shadow-[0_10px_40px_rgba(244,63,94,0.3)] flex items-center gap-3.5 animate-bounce">
+          <div className="p-2 rounded-xl bg-rose-900/60 border border-rose-500/40 text-rose-300">
+            <AlertOctagon className="w-5 h-5 animate-pulse" />
+          </div>
+          <span className="text-xs font-mono font-bold">{toastMessage}</span>
           <button
             onClick={dismissToast}
-            className="p-1 rounded text-rose-400 hover:text-white transition-colors"
+            className="p-1 rounded-lg text-rose-300 hover:text-white hover:bg-rose-900/40 transition-colors ml-2"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Primary Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-cyber-900/90 border-b border-cyber-border backdrop-blur-md">
-        <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+      {/* Top Glassmorphic Navbar */}
+      <header className="sticky top-0 z-40 bg-slate-950/60 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Brand Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-500/50 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(0,242,254,0.3)]">
-                <Network className="w-6 h-6 animate-pulse-slow" />
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shadow-[0_0_20px_rgba(0,242,254,0.3)] backdrop-blur-md">
+                <Network className="w-5 h-5 animate-pulse-slow" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-base font-extrabold font-mono tracking-wider text-slate-100">
-                    FRAUDGRAPH <span className="text-cyan-400 font-black">AI</span>
+                  <h1 className="text-base font-extrabold font-mono tracking-wider text-white flex items-center gap-1.5">
+                    FRAUDGRAPH <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-black">AI</span>
                   </h1>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40">
-                    V1.0 HACKATHON
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
+                    ENTERPRISE AML
                   </span>
                 </div>
-                <p className="text-[10px] font-mono text-slate-400 tracking-tight">
-                  Real-Time Mule Network & Fraud Intelligence Platform
+                <p className="text-[11px] font-mono text-slate-400 tracking-tight flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-cyan-400" /> Real-Time Mule Ring & Network Forensics
                 </p>
               </div>
             </div>
 
-            {/* Live Telemetry Pill */}
-            <div className="hidden md:flex items-center gap-4 font-mono text-xs">
-              <div className="flex items-center gap-2 bg-cyber-950 border border-cyber-border rounded-lg px-3 py-1.5">
-                <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-ping' : 'bg-rose-500'}`} />
-                <span className="text-slate-400 text-[11px]">
-                  WebSocket: <strong className={isConnected ? 'text-emerald-400' : 'text-rose-400'}>{isConnected ? 'LIVE FEED' : 'OFFLINE'}</strong>
+            {/* Live Telemetry Glass Pills */}
+            <div className="hidden md:flex items-center gap-3 font-mono text-xs">
+              <div className="flex items-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-xl px-3.5 py-1.5 shadow-glass">
+                <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 shadow-[0_0_8px_#34d399] animate-ping' : 'bg-rose-500'}`} />
+                <span className="text-slate-300 text-[11px]">
+                  WebSocket: <strong className={isConnected ? 'text-emerald-300' : 'text-rose-400'}>{isConnected ? 'LIVE FEED' : 'OFFLINE'}</strong>
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 bg-cyber-950 border border-cyber-border rounded-lg px-3 py-1.5">
-                <span className="text-slate-400 text-[11px]">
-                  Simulator: <strong className={isSimulating ? 'text-cyan-400' : 'text-amber-400'}>{isSimulating ? '2000ms TX STREAM' : 'PAUSED'}</strong>
+              <div className="flex items-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-xl px-3.5 py-1.5 shadow-glass">
+                <span className="text-slate-300 text-[11px]">
+                  Simulator: <strong className={isSimulating ? 'text-cyan-300 font-bold' : 'text-amber-400 font-bold'}>{isSimulating ? '2000ms TX STREAM' : 'PAUSED'}</strong>
                 </span>
               </div>
             </div>
           </div>
 
           {/* Module Navigation Tabs */}
-          <nav className="flex items-center gap-1 overflow-x-auto py-2 border-t border-cyber-border/60 scrollbar-none">
+          <nav className="flex items-center gap-1.5 overflow-x-auto py-2.5 border-t border-white/[0.06] scrollbar-none">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -246,17 +247,17 @@ export function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono font-medium whitespace-nowrap transition-all ${
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-medium whitespace-nowrap transition-all duration-300 ${
                     isActive
-                      ? 'bg-cyan-500 text-slate-950 font-bold shadow-[0_0_12px_rgba(0,242,254,0.35)]'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-cyber-850'
+                      ? 'bg-gradient-to-r from-cyan-500/20 via-blue-500/15 to-purple-500/15 text-white font-bold border border-cyan-400/50 shadow-[0_0_20px_rgba(0,242,254,0.25)] backdrop-blur-md'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04] border border-transparent'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-300' : 'text-slate-400'}`} />
                   <span>{tab.label}</span>
                   {tab.badge !== undefined && tab.badge > 0 && (
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                      isActive ? 'bg-slate-950 text-cyan-400' : 'bg-rose-600 text-white'
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      isActive ? 'bg-cyan-400 text-slate-950' : 'bg-rose-500/80 text-white shadow-[0_0_8px_rgba(244,63,94,0.4)]'
                     }`}>
                       {tab.badge}
                     </span>
@@ -269,7 +270,7 @@ export function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-[1700px] w-full mx-auto px-4 sm:px-6 pt-6">
+      <main className="flex-1 max-w-[1720px] w-full mx-auto px-4 sm:px-6 pt-6">
         {activeTab === 'dashboard' && (
           <OverviewDashboard
             summary={summary}
@@ -350,16 +351,16 @@ export function App() {
       </main>
 
       {/* Status Bar Footer */}
-      <footer className="bg-cyber-900 border-t border-cyber-border py-3 px-6 text-xs font-mono text-slate-500 flex flex-wrap items-center justify-between gap-4 mt-auto">
+      <footer className="bg-slate-950/60 backdrop-blur-2xl border-t border-white/10 py-3.5 px-6 text-xs font-mono text-slate-400 flex flex-wrap items-center justify-between gap-4 mt-auto">
         <div className="flex items-center gap-4">
-          <span>FRAUDGRAPH AI v1.0.0</span>
+          <span className="font-bold text-slate-200">FRAUDGRAPH AI v1.0.0</span>
           <span>•</span>
           <span>FastAPI + NetworkX + Scikit-Learn + React + Tailwind</span>
           <span>•</span>
-          <span className="text-cyan-400">Deterministic Synthetic Sandbox</span>
+          <span className="text-cyan-400">Glassmorphic Cyber Defense UI</span>
         </div>
-        <div>
-          <span>Strictly for Demonstration • Synthetic Banking Ecosystem</span>
+        <div className="text-slate-400">
+          Strictly for Demonstration • Synthetic Banking Ecosystem
         </div>
       </footer>
     </div>

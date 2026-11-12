@@ -34,3 +34,4 @@ def test_normal_transaction():
     )
     assert eval_res["is_flagged"] is False
     assert eval_res["primary_pattern"] == "NORMAL"
+

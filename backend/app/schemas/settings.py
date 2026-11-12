@@ -19,3 +19,4 @@ class SettingsUpdate(BaseModel):
 class SimulatorControl(BaseModel):
     action: str  # start, stop, step, reset
     speed_ms: int = 2000
+
