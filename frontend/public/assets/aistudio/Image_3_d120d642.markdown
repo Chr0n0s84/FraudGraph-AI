@@ -1,0 +1,249 @@
+---
+name: Obsidian Forensics
+colors:
+  surface: '#0e1320'
+  surface-dim: '#0e1320'
+  surface-bright: '#343948'
+  surface-container-lowest: '#090e1b'
+  surface-container-low: '#161b29'
+  surface-container: '#1a1f2d'
+  surface-container-high: '#252a38'
+  surface-container-highest: '#303443'
+  on-surface: '#dee2f5'
+  on-surface-variant: '#b9cacb'
+  inverse-surface: '#dee2f5'
+  inverse-on-surface: '#2b303e'
+  outline: '#849495'
+  outline-variant: '#3a494b'
+  surface-tint: '#00dce6'
+  primary: '#e0fdff'
+  on-primary: '#00373a'
+  primary-container: '#00f2fe'
+  on-primary-container: '#006a70'
+  inverse-primary: '#00696f'
+  secondary: '#7bd0ff'
+  on-secondary: '#00354a'
+  secondary-container: '#00a6e0'
+  on-secondary-container: '#00374d'
+  tertiary: '#e1ffec'
+  on-tertiary: '#003824'
+  tertiary-container: '#67f4b7'
+  on-tertiary-container: '#006e4b'
+  error: '#ffb4ab'
+  on-error: '#690005'
+  error-container: '#93000a'
+  on-error-container: '#ffdad6'
+  primary-fixed: '#6ff6ff'
+  primary-fixed-dim: '#00dce6'
+  on-primary-fixed: '#002022'
+  on-primary-fixed-variant: '#004f53'
+  secondary-fixed: '#c4e7ff'
+  secondary-fixed-dim: '#7bd0ff'
+  on-secondary-fixed: '#001e2c'
+  on-secondary-fixed-variant: '#004c69'
+  tertiary-fixed: '#6ffbbe'
+  tertiary-fixed-dim: '#4edea3'
+  on-tertiary-fixed: '#002113'
+  on-tertiary-fixed-variant: '#005236'
+  background: '#0e1320'
+  on-background: '#dee2f5'
+  surface-variant: '#303443'
+typography:
+  display-lg:
+    fontFamily: Space Grotesk
+    fontSize: 40px
+    fontWeight: '700'
+    lineHeight: 48px
+    letterSpacing: -0.02em
+  display-lg-mobile:
+    fontFamily: Space Grotesk
+    fontSize: 30px
+    fontWeight: '700'
+    lineHeight: 38px
+    letterSpacing: -0.01em
+  headline-lg:
+    fontFamily: Space Grotesk
+    fontSize: 28px
+    fontWeight: '600'
+    lineHeight: 36px
+    letterSpacing: -0.015em
+  headline-md:
+    fontFamily: Space Grotesk
+    fontSize: 22px
+    fontWeight: '600'
+    lineHeight: 30px
+    letterSpacing: -0.01em
+  headline-sm:
+    fontFamily: Space Grotesk
+    fontSize: 18px
+    fontWeight: '600'
+    lineHeight: 26px
+    letterSpacing: 0em
+  body-lg:
+    fontFamily: Geist
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: 24px
+    letterSpacing: 0em
+  body-md:
+    fontFamily: Geist
+    fontSize: 14px
+    fontWeight: '400'
+    lineHeight: 20px
+    letterSpacing: 0.005em
+  body-sm:
+    fontFamily: Geist
+    fontSize: 12px
+    fontWeight: '400'
+    lineHeight: 18px
+    letterSpacing: 0.01em
+  code-lg:
+    fontFamily: JetBrains Mono
+    fontSize: 15px
+    fontWeight: '500'
+    lineHeight: 22px
+    letterSpacing: -0.01em
+  code-md:
+    fontFamily: JetBrains Mono
+    fontSize: 13px
+    fontWeight: '500'
+    lineHeight: 18px
+    letterSpacing: -0.01em
+  code-sm:
+    fontFamily: JetBrains Mono
+    fontSize: 11px
+    fontWeight: '500'
+    lineHeight: 16px
+    letterSpacing: 0em
+  label-md:
+    fontFamily: JetBrains Mono
+    fontSize: 12px
+    fontWeight: '600'
+    lineHeight: 16px
+    letterSpacing: 0.06em
+  label-sm:
+    fontFamily: JetBrains Mono
+    fontSize: 10px
+    fontWeight: '600'
+    lineHeight: 14px
+    letterSpacing: 0.08em
+rounded:
+  sm: 0.125rem
+  DEFAULT: 0.25rem
+  md: 0.375rem
+  lg: 0.5rem
+  xl: 0.75rem
+  full: 9999px
+spacing:
+  gutter: 1rem
+  gutter-desktop: 1.25rem
+  margin: 1rem
+  margin-desktop: 1.5rem
+  space-xs: 0.25rem
+  space-sm: 0.5rem
+  space-md: 0.75rem
+  space-lg: 1.25rem
+  space-xl: 2rem
+---
+
+## Brand & Style
+
+This design system is engineered for intelligence analysts, forensic investigators, and anti-financial crime operations teams managing complex illicit network topologies. The UI projects an aura of mission-critical control, algorithmic precision, and high-stakes surveillance.
+
+The aesthetic fuses **Tactile Cyber-Minimalism** with **Analytical Glassmorphism**:
+- **Atmospheric Depth:** Deep obsidian and abyssal navy canvases establish zero-distraction workspaces, reducing optical fatigue during protracted investigation workflows.
+- **Precision Luminescence:** Focused electric cyan pulses guide the analyst’s gaze toward high-priority anomalies, entity relationship nodes, and forensic triggers.
+- **Cognitive Clarity:** High-density data architecture with strict visual segregation between ordinary entity records, suspect intermediary behaviors, and critical fraud vectors.
+- **Tactile Trust:** Crisp microscopic borders, low-opacity vitreous panels, and razor-sharp monospaced data streams deliver a professional, mission-ready cybersecurity console experience.
+
+## Colors
+
+The palette establishes an ultra-dark backdrop accented by calibrated luminescent telemetry signals. Every hue carries strict semantic weight across forensic workflows.
+
+### Palette Architecture
+- **Canvas & Structural Layers:**
+  - Base Ground: `#080d1a` (deepest void background).
+  - Raised Panel / Surface: `#0b1329` (card canvas, navigation docks).
+  - Elevated Container: `#0f1c3f` (hover states, modal overlays, elevated entity trays).
+- **Primary Cyber Matrix:**
+  - Anchor Cyan: `#00f2fe` (graph linkages, focal nodes, primary actions, active telemetry).
+  - Atmospheric Cyan: `#00d2ff` and Soft Cyan `#38bdf8` (secondary interactions, sub-node highlights, filter chips).
+- **Forensic Threat Spectrum:**
+  - **Cleared / Legitimate:** `#10b981` (clean transactions, authenticated counter-parties).
+  - **Flagged / Intermediate Risk:** `#f59e0b` (velocity spikes, nested shells, suspicious hops).
+  - **Critical Breach / Severe Risk:** `#ef4444` and glowing Crimson `#f43f5e` (fraud syndicates, sanction hits, synthetic identities).
+- **Text & Contrast System:**
+  - Highest Importance: `#f8fafc` (primary metric values, high-risk headlines).
+  - Secondary Readability: `#94a3b8` (metadata labels, schema attributes, node titles).
+  - Muted Technical Data: `#475569` (structural dividers, inactive timestamps, pagination).
+
+## Typography
+
+The typographic hierarchy accommodates two complementary operational needs: synthetic overview analysis and granular evidentiary scanning.
+
+- **Primary Structure (`Space Grotesk`):** Imparts geometric authority and analytical rigor to dossier headers, graph module titles, and dashboard macro metrics.
+- **Narrative & Records (`Geist`):** Delivers clean readability for investigation logs, analyst notes, narrative case timelines, and configuration flows.
+- **Data & Telemetry (`JetBrains Mono`):** Dedicated exclusively to account identifiers, transaction hashes, IP addresses, currency figures, timestamps, and confidence percentages to ensure immediate columnar scanability without digit misinterpretation.
+- **Micro Labels:** All system status labels, taxonomy tags, and table headers adopt uppercase monospace formatting with generous tracking for instantaneous legibility in dark conditions.
+
+## Layout & Spacing
+
+The system implements a high-density, multi-pane forensic command layout engineered to maximize visual canvas area for entity-relationship canvas graphs, temporal heatmaps, and transaction ledgers.
+
+### Layout Hierarchy
+- **Canvas Multi-Pane Framework:** A persistent collapsible sidebar (260px) paired with an elastic graph/analysis canvas, accompanied by an inspectable contextual sliding drawer (380px) on the right for entity drill-downs.
+- **Data Grid Architecture:** Desktop screens utilize a 12-column adaptive fluid grid with tight 1.25rem gutters, preserving pixel efficiency for data tables and multi-metric visualizers.
+- **Responsive Adaptations:**
+  - **Desktop (1280px+):** Full 3-pane operational mode (Navigation + Analysis Workspace/Network Canvas + Entity Intelligence Drawer).
+  - **Tablet (768px - 1279px):** Inspector drawer docks to an overlay sheet; the 12-column layout collapses to 8 columns; metrics wrap to dual-stack units.
+  - **Mobile (<767px):** Inspector transitions into a full-bleed modal sheet; graph rendering downgrades to prioritized timeline list formats; grid collapses to 4 single-column units with 1rem lateral gutters.
+
+## Elevation & Depth
+
+Visual hierarchy does not rely on traditional opaque drop shadows. Depth is established through **Spectral Dark Glassmorphism**, luminosity boundaries, and chromatic glow vectors.
+
+### Layering Mechanics
+- **Base Ground (`#080d1a`):** Infinite depth plane housing background network rendering nodes.
+- **Glassmorphic Paneling (Level 1):** Background `#0b1329` at 85% opacity, paired with a `16px` backdrop blur (`backdrop-filter: blur(16px)`) and a continuous 1px ghost border of `rgba(56, 189, 248, 0.12)`.
+- **Active Overlay Panels (Level 2):** Context menus, quick inspect drawers, and hovered nodes shift to `#0f1c3f` at 92% opacity, bound by `rgba(0, 242, 254, 0.35)` borders.
+
+### Forensic Glow Tiers
+Depth is prioritized by risk severity and focus state using subtle radial and edge glows:
+- **Default Focus:** `0 0 12px rgba(0, 242, 254, 0.25)` applied to selected nodes and focused inputs.
+- **Normal Entity:** `0 0 8px rgba(16, 185, 129, 0.25)`.
+- **Medium Threat:** `0 0 10px rgba(245, 158, 11, 0.3)`.
+- **High Risk Alert:** Dynamic aura `0 0 18px rgba(244, 63, 94, 0.45)` with a 1px solid `#f43f5e` boundary to pull immediate operator intervention.
+
+## Shapes
+
+The design system enforces a sharp, disciplined geometry (`roundedness: 1`). Soft, overly rounded or playful contours are strictly avoided to preserve technical authority.
+
+- **Base Radius (0.25rem / 4px):** Standard buttons, monospaced risk chips, table rows, input fields, and tooltip callouts.
+- **Card & Modal Radius (0.5rem / 8px):** Structural investigation panels, timeline viewports, inspector sheets, and dialog surfaces.
+- **Graph Nodes & Circular Badges:** Kept strictly circular (`rounded-full`) exclusively for network graph entity markers, node avatar pins, and active status telemetry pings to maximize topological differentiation against angular UI frames.
+
+## Components
+
+### Buttons & Interactive Controls
+- **Primary Forensic Action:** Solid electric cyan `#00f2fe` background with obsidian `#080d1a` text (`code-md` or `label-md`). Hover elevates luminosity with a `0 0 14px rgba(0, 242, 254, 0.5)` cyan halo.
+- **Secondary / Ghost Action:** Translucent fill `rgba(15, 28, 63, 0.6)` paired with a 1px border of `rgba(56, 189, 248, 0.3)` and `#f8fafc` text. Hover shifts border to `rgba(0, 242, 254, 0.8)`.
+- **Critical Action:** Translucent crimson background `rgba(239, 68, 68, 0.12)` bordered by `#ef4444` with `#f43f5e` text, triggering immediate visual confirmation states.
+
+### Status Badges & Risk Chips
+- Compact dimensions (`label-sm`), fixed 4px radius, inline-flex alignment.
+- **Critical Threat:** Background `rgba(244, 63, 94, 0.15)`, text `#f43f5e`, border `1px solid rgba(244, 63, 94, 0.4)`, accented by a pulsing 6px circular dot indicator.
+- **Suspicious:** Background `rgba(245, 158, 11, 0.15)`, text `#f59e0b`, border `1px solid rgba(245, 158, 11, 0.4)`.
+- **Verified Clean:** Background `rgba(16, 185, 129, 0.12)`, text `#10b981`, border `1px solid rgba(16, 185, 129, 0.35)`.
+
+### Forensic Data Tables & Transaction Ledgers
+- Alternating subtle rows using `#080d1a` and `#0b1329`. Row borders: 1px bottom border of `rgba(255, 255, 255, 0.04)`.
+- Hover triggers background `#0f1c3f` and a faint neon cyan line indicator on the left edge.
+- Monospaced numerical values right-aligned; currency symbols rendered in secondary muted tones with high-contrast digits.
+
+### Network Graph Canvas Nodes
+- Visual circles framed by a double-ring boundary: an inner solid glyph ring and an outer translucent status halo keyed to the entity's risk tier (Cyan, Amber, or Glowing Crimson).
+- Connecting edges use variable opacity (`0.2` to `0.8`) and cyan or crimson dash animations to represent transaction direction and flow volume.
+
+### Form Inputs & Search Filters
+- Input fields utilize dark inset backgrounds `#070b16` with a default 1px border of `rgba(56, 189, 248, 0.2)`.
+- Focused state transforms the border to `#00f2fe` with an internal glow `inset 0 0 6px rgba(0, 242, 254, 0.2)`. Placeholder text formatted in `Geist` `#475569`; user query inputs formatted in `JetBrains Mono` `#f8fafc`.
