@@ -22,6 +22,11 @@ export function NetworkGraph({
 }: NetworkGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<any>(null);
+  const nodeCacheRef = useRef<Map<string, any>>(new Map());
+  const prevFilteredRef = useRef<{ nodes: any[]; links: any[]; topologyKey: string } | null>(null);
+  const cameraSnapshotRef = useRef<{ zoom: number; center: { x: number; y: number } } | null>(null);
+  const lastCenteredPresetRef = useRef<'cycle' | 'fan-in' | null>(null);
+  const lastCenteredAccountRef = useRef<string | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
 
@@ -42,10 +47,67 @@ export function NetworkGraph({
     return () => observer.disconnect();
   }, []);
 
-  // Filtered graph data
+  // Incrementally merge graphData while preserving existing node objects, positions, and zoom
   const filteredData = useMemo(() => {
-    let nodes = [...graphData.nodes];
+    const cache = nodeCacheRef.current;
+    const incomingIds = new Set(graphData.nodes.map((n) => n.id));
 
+    // Remove nodes no longer present in graphData
+    for (const id of Array.from(cache.keys())) {
+      if (!incomingIds.has(id)) {
+        cache.delete(id);
+      }
+    }
+
+    const hadPositionedNodes = Array.from(cache.values()).some(
+      (n) => Number.isFinite(n.x) && Number.isFinite(n.y)
+    );
+
+    // Update existing node objects in place (preserving x, y, vx, vy, fx, fy) and seed new nodes
+    const newlyAddedNodes: any[] = [];
+    for (const n of graphData.nodes) {
+      const existing = cache.get(n.id);
+      if (existing) {
+        existing.risk = n.risk;
+        existing.score = n.score;
+        if (n.cluster !== undefined) existing.cluster = n.cluster;
+      } else {
+        const created: any = { ...n };
+        cache.set(n.id, created);
+        newlyAddedNodes.push(created);
+      }
+    }
+
+    // Seed newly arrived nodes near a connected positioned neighbor so they enter smoothly
+    if (hadPositionedNodes && newlyAddedNodes.length > 0) {
+      for (const created of newlyAddedNodes) {
+        let anchor: any = null;
+        for (const e of graphData.edges) {
+          const src = typeof e.source === 'object' ? (e.source as GraphNode).id : e.source;
+          const tgt = typeof e.target === 'object' ? (e.target as GraphNode).id : e.target;
+          if (src === created.id) {
+            const candidate = cache.get(tgt);
+            if (candidate && Number.isFinite(candidate.x) && Number.isFinite(candidate.y)) {
+              anchor = candidate;
+              break;
+            }
+          } else if (tgt === created.id) {
+            const candidate = cache.get(src);
+            if (candidate && Number.isFinite(candidate.x) && Number.isFinite(candidate.y)) {
+              anchor = candidate;
+              break;
+            }
+          }
+        }
+        if (anchor) {
+          const angle = Math.random() * Math.PI * 2;
+          created.x = anchor.x + Math.cos(angle) * 28;
+          created.y = anchor.y + Math.sin(angle) * 28;
+        }
+      }
+    }
+
+    let nodes = graphData.nodes.map((n) => cache.get(n.id));
     if (riskFilter !== 'all') {
       nodes = nodes.filter((n) => n.risk === riskFilter);
     }
@@ -57,24 +119,84 @@ export function NetworkGraph({
       return nodeIds.has(src) && nodeIds.has(tgt);
     });
 
-    return {
-      nodes: nodes.map((n) => ({ ...n })),
+    const nodeKey = nodes.map((n) => n.id).sort().join(',');
+    const edgeKey = edges
+      .map((e) => {
+        const src = typeof e.source === 'object' ? (e.source as GraphNode).id : e.source;
+        const tgt = typeof e.target === 'object' ? (e.target as GraphNode).id : e.target;
+        return `${src}->${tgt}:${e.amount}`;
+      })
+      .sort()
+      .join('|');
+    const topologyKey = `${riskFilter}::${nodeKey}::${edgeKey}`;
+
+    if (prevFilteredRef.current && prevFilteredRef.current.topologyKey === topologyKey) {
+      return prevFilteredRef.current;
+    }
+
+    // Preserve camera zoom/pan and existing node positions across incremental topology updates
+    if (prevFilteredRef.current && prevFilteredRef.current.nodes.length > 0 && fgRef.current) {
+      const currentZoom = fgRef.current.zoom();
+      const currentCenter = fgRef.current.centerAt();
+      if (
+        Number.isFinite(currentZoom) &&
+        currentCenter &&
+        Number.isFinite(currentCenter.x) &&
+        Number.isFinite(currentCenter.y)
+      ) {
+        cameraSnapshotRef.current = { zoom: currentZoom, center: currentCenter };
+      }
+
+      for (const n of nodes) {
+        if (!newlyAddedNodes.includes(n) && Number.isFinite(n.x) && Number.isFinite(n.y)) {
+          n.fx = n.x;
+          n.fy = n.y;
+        }
+      }
+    }
+
+    const nextData = {
+      nodes,
       links: edges.map((e) => ({
         source: typeof e.source === 'object' ? (e.source as GraphNode).id : e.source,
         target: typeof e.target === 'object' ? (e.target as GraphNode).id : e.target,
         amount: e.amount,
       })),
+      topologyKey,
     };
+    prevFilteredRef.current = nextData;
+    return nextData;
   }, [graphData, riskFilter]);
 
-  // Handle Preset zoom / focus
+  // Restore zoom/pan after incremental graphData updates so ForceGraph2D never auto-resets view
   useEffect(() => {
-    if (!fgRef.current || !highlightPreset) return;
+    const snap = cameraSnapshotRef.current;
+    if (!snap || !fgRef.current) return;
+    cameraSnapshotRef.current = null;
+    fgRef.current.centerAt(snap.center.x, snap.center.y, 0);
+    fgRef.current.zoom(snap.zoom, 0);
+    const rafId = window.requestAnimationFrame(() => {
+      if (fgRef.current) {
+        fgRef.current.centerAt(snap.center.x, snap.center.y, 0);
+        fgRef.current.zoom(snap.zoom, 0);
+      }
+    });
+    return () => window.cancelAnimationFrame(rafId);
+  }, [filteredData]);
+
+  // Handle Preset zoom / focus only when preset changes
+  useEffect(() => {
+    if (!highlightPreset) {
+      lastCenteredPresetRef.current = null;
+      return;
+    }
+    if (!fgRef.current || lastCenteredPresetRef.current === highlightPreset) return;
 
     if (highlightPreset === 'cycle') {
       // 5-Node Cycle nodes: A101, A102, A103, A104, A105
       const cycleNode = filteredData.nodes.find((n) => n.id === 'A101');
       if (cycleNode && Number.isFinite(cycleNode.x) && Number.isFinite(cycleNode.y)) {
+        lastCenteredPresetRef.current = highlightPreset;
         fgRef.current.centerAt(cycleNode.x, cycleNode.y, 800);
         fgRef.current.zoom(2.5, 800);
       }
@@ -82,17 +204,23 @@ export function NetworkGraph({
       // Fan-in hub: A4821
       const hubNode = filteredData.nodes.find((n) => n.id === 'A4821');
       if (hubNode && Number.isFinite(hubNode.x) && Number.isFinite(hubNode.y)) {
+        lastCenteredPresetRef.current = highlightPreset;
         fgRef.current.centerAt(hubNode.x, hubNode.y, 800);
         fgRef.current.zoom(2.5, 800);
       }
     }
   }, [highlightPreset, filteredData]);
 
-  // When selectedAccountId changes, center on that node
+  // Center on selectedAccountId only when the selection changes, never on graph polling updates
   useEffect(() => {
-    if (!fgRef.current || !selectedAccountId) return;
+    if (!selectedAccountId) {
+      lastCenteredAccountRef.current = null;
+      return;
+    }
+    if (!fgRef.current || lastCenteredAccountRef.current === selectedAccountId) return;
     const targetNode = filteredData.nodes.find((n) => n.id === selectedAccountId);
     if (targetNode && Number.isFinite(targetNode.x) && Number.isFinite(targetNode.y)) {
+      lastCenteredAccountRef.current = selectedAccountId;
       fgRef.current.centerAt(targetNode.x, targetNode.y, 600);
       fgRef.current.zoom(2.2, 600);
     }
@@ -129,8 +257,8 @@ export function NetworkGraph({
             gradient.addColorStop(0, 'rgba(0, 242, 254, 0.8)');
             gradient.addColorStop(1, 'rgba(0, 242, 254, 0)');
           } else {
-            gradient.addColorStop(0, 'rgba(244, 63, 94, 0.7)');
-            gradient.addColorStop(1, 'rgba(244, 63, 94, 0)');
+            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.7)');
+            gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
           }
           ctx.fillStyle = gradient;
           ctx.beginPath();
@@ -144,8 +272,8 @@ export function NetworkGraph({
         const innerRadius = Math.max(0.1, radius * 0.5);
         try {
           const gradient = ctx.createRadialGradient(node.x, node.y, innerRadius, node.x, node.y, glowRadius);
-          gradient.addColorStop(0, 'rgba(245, 158, 11, 0.5)');
-          gradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+          gradient.addColorStop(0, 'rgba(249, 115, 22, 0.5)');
+          gradient.addColorStop(1, 'rgba(249, 115, 22, 0)');
           ctx.fillStyle = gradient;
           ctx.beginPath();
           ctx.arc(node.x, node.y, glowRadius, 0, 2 * Math.PI, false);
@@ -155,16 +283,16 @@ export function NetworkGraph({
         }
       }
 
-      // Base solid circle
+      // Base solid circle: normal=blue, suspicious=orange, high=red
       ctx.beginPath();
       ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
 
       if (node.risk === 'high') {
-        ctx.fillStyle = '#f43f5e';
+        ctx.fillStyle = '#ef4444';
       } else if (node.risk === 'suspicious') {
-        ctx.fillStyle = '#f59e0b';
+        ctx.fillStyle = '#f97316';
       } else {
-        ctx.fillStyle = '#00dce6';
+        ctx.fillStyle = '#3b82f6';
       }
       ctx.fill();
 
@@ -178,7 +306,7 @@ export function NetworkGraph({
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius + 2.5, 0, 2 * Math.PI, false);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(244, 63, 94, 0.6)';
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
         ctx.stroke();
       }
 
@@ -202,10 +330,10 @@ export function NetworkGraph({
         ctx.fillStyle = isSelected
           ? '#00f2fe'
           : node.risk === 'high'
-          ? '#ffb4ab'
+          ? '#fca5a5'
           : node.risk === 'suspicious'
-          ? '#fcd34d'
-          : '#dee2f5';
+          ? '#fdba74'
+          : '#93c5fd';
         ctx.fillText(text, node.x, textY);
       }
     },
@@ -289,15 +417,15 @@ export function NetworkGraph({
       {/* Bottom Legend Overlay */}
       <div className="absolute bottom-3 left-3 z-10 glass-panel px-3 py-2 rounded text-[11px] font-mono-data flex flex-wrap items-center gap-4 text-[#94a3b8] pointer-events-auto">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e] shadow-[0_0_8px_#f43f5e]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444] shadow-[0_0_8px_#ef4444]" />
           <span className="text-[#f8fafc]">High Threat (Score ≥ 70)</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_8px_#f59e0b]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#f97316] shadow-[0_0_8px_#f97316]" />
           <span className="text-[#f8fafc]">Suspicious (40-69)</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#00dce6]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6] shadow-[0_0_8px_#3b82f6]" />
           <span className="text-[#f8fafc]">Normal (0-39)</span>
         </div>
         <span className="text-[#475569]">|</span>
@@ -310,9 +438,14 @@ export function NetworkGraph({
         width={dimensions.width}
         height={dimensions.height}
         graphData={filteredData}
+        autoPauseRedraw={false}
         backgroundColor="#080d1a"
         nodeCanvasObject={drawNode}
         nodePointerAreaPaint={drawPointerArea}
+        onNodeDragEnd={(node: any) => {
+          node.fx = node.x;
+          node.fy = node.y;
+        }}
         linkColor={(link: any) => {
           const srcId = typeof link.source === 'object' ? link.source.id : link.source;
           const tgtId = typeof link.target === 'object' ? link.target.id : link.target;

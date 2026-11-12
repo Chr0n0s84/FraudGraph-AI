@@ -141,6 +141,32 @@ export default function App() {
     };
   }, [applyTransactions]);
 
+  // Poll getGraph() every 5s
+  useEffect(() => {
+    let isMounted = true;
+    let isPolling = false;
+
+    const pollGraph = async () => {
+      if (isPolling) return;
+      isPolling = true;
+      try {
+        const graphRes = await getGraph();
+        if (!isMounted) return;
+        setGraphData(graphRes);
+      } catch (err) {
+        console.error('Failed to poll graph topology from api.js:', err);
+      } finally {
+        isPolling = false;
+      }
+    };
+
+    const intervalId = window.setInterval(pollGraph, 5000);
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, []);
+
   useEffect(() => {
     return () => {
       flashTimersRef.current.forEach((id) => clearTimeout(id));
