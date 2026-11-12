@@ -43,32 +43,38 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     borderHover = 'hover:border-emerald-400/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.15)]';
   }
 
+  const cardClass = variant === 'red' ? 'card-3d-danger' : 'card-3d';
+
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-xl border border-white/10 p-5 transition-all duration-300 frost-shine ${borderHover}`}>
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-5 frost-shine cursor-pointer ${cardClass} ${borderHover}`}>
+      {/* 3D Specular Highlight Edge */}
+      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+
       {/* Ambient background light orb */}
       <div className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${glowGradient} rounded-full blur-2xl pointer-events-none`} />
 
       <div className="relative z-10 flex items-start justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-wider font-mono text-slate-400 font-semibold mb-1">
+          <p className="text-[11px] uppercase tracking-wider font-mono text-slate-400 font-semibold mb-1 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400/80 animate-pulse" />
             {title}
           </p>
-          <h3 className="text-2xl font-bold font-mono tracking-tight text-white drop-shadow-sm">
+          <h3 className="text-2xl font-black font-mono tracking-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
             {value}
           </h3>
           {subtitle && (
-            <p className="text-[11px] text-slate-400 mt-1 font-sans">{subtitle}</p>
+            <p className="text-[11px] text-slate-300/80 mt-1 font-sans">{subtitle}</p>
           )}
         </div>
-        <div className={`w-11 h-11 rounded-xl border flex items-center justify-center p-2.5 backdrop-blur-md ${iconBg}`}>
+        <div className={`w-11 h-11 rounded-xl border flex items-center justify-center p-2.5 backdrop-blur-md transition-transform duration-300 group-hover:scale-110 ${iconBg}`}>
           <Icon className="w-full h-full" />
         </div>
       </div>
 
       {trend && (
-        <div className="relative z-10 mt-3 pt-3 border-t border-white/[0.06] flex items-center text-xs">
-          <span className={`font-mono font-bold px-1.5 py-0.5 rounded ${
-            trend.isPositive ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-500/30' : 'text-rose-300 bg-rose-950/60 border border-rose-500/30'
+        <div className="relative z-10 mt-3 pt-3 border-t border-white/[0.08] flex items-center text-xs">
+          <span className={`font-mono font-bold px-1.5 py-0.5 rounded shadow-sm ${
+            trend.isPositive ? 'text-emerald-300 bg-emerald-950/70 border border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.2)]' : 'text-rose-300 bg-rose-950/70 border border-rose-500/40 shadow-[0_0_8px_rgba(244,63,94,0.2)]'
           }`}>
             {trend.value}
           </span>

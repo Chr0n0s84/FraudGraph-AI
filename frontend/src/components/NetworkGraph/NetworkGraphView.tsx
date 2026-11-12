@@ -10,9 +10,12 @@ import {
   ExternalLink,
   X,
   Layers,
-  Sparkles
+  Sparkles,
+  Box,
+  Eye,
+  Activity
 } from 'lucide-react';
-import type { NetworkGraphData, GraphNodeData } from '../../types';
+import type { NetworkGraphData, GraphNodeData, GraphEdgeData } from '../../types';
 import { RiskBadge } from '../common/RiskBadge';
 import { api } from '../../services/api';
 
@@ -24,8 +27,11 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
   const [graphData, setGraphData] = useState<NetworkGraphData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<GraphNodeData | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<GraphNodeData | null>(null);
+  const [hoveredEdge, setHoveredEdge] = useState<GraphEdgeData | null>(null);
   const [nodeSearch, setNodeSearch] = useState('');
   const [activePatternFilter, setActivePatternFilter] = useState<string>('ALL');
+  const [is3DView, setIs3DView] = useState(true);
   
   // Transform & Pan/Zoom State
   const [zoom, setZoom] = useState(1);
@@ -187,8 +193,21 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
           ))}
         </div>
 
-        {/* Zoom & Fit Controls */}
+        {/* Zoom & Fit & 3D Matrix Controls */}
         <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setIs3DView(!is3DView)}
+            className={`px-3 py-1.5 rounded-xl border font-mono text-xs font-bold flex items-center gap-1.5 transition-all duration-300 ${
+              is3DView
+                ? 'bg-gradient-to-r from-cyan-500/30 to-purple-500/30 text-cyan-200 border-cyan-400/80 shadow-[0_0_20px_rgba(0,242,254,0.35)] backdrop-blur-md'
+                : 'bg-white/[0.04] text-slate-300 border-white/10 hover:bg-white/[0.08]'
+            }`}
+            title="Toggle 3D Holographic Matrix Projection"
+          >
+            <Box className={`w-4 h-4 ${is3DView ? 'text-cyan-300 animate-spin-slow' : 'text-slate-400'}`} />
+            <span>{is3DView ? '3D Matrix Mode' : '2D Plane'}</span>
+          </button>
+
           <button
             onClick={() => setZoom((z) => Math.min(2.5, z + 0.2))}
             className="p-2 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] text-slate-300 hover:text-white transition-colors"
@@ -232,10 +251,56 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           className="lg:col-span-3 h-[680px] bg-slate-950/70 border border-white/10 rounded-2xl relative overflow-hidden select-none cursor-grab active:cursor-grabbing radar-grid shadow-glass backdrop-blur-2xl"
+          style={{
+            perspective: is3DView ? '1200px' : 'none',
+          }}
         >
+          {/* Cyber Radar Scanline */}
+          <div className="cyber-scanline" />
+
           {/* Ambient Canvas Lighting */}
-          <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-cyan-500/05 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-rose-500/05 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Interactive Floating 3D Hover HUD (Edge or Node Details) */}
+          {(hoveredEdge || hoveredNode) && (
+            <div className="absolute top-4 right-4 z-20 bg-slate-900/80 border border-cyan-400/50 backdrop-blur-2xl rounded-xl px-4 py-2.5 text-xs font-mono shadow-[0_0_25px_rgba(0,242,254,0.3)] animate-fadeIn pointer-events-none flex items-center gap-3">
+              {hoveredEdge && (
+                <>
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+                  <div>
+                    <span className="text-slate-400 text-[10px] uppercase block">LIVE TRANSACTION LINK</span>
+                    <span className="text-white font-bold">
+                      ${hoveredEdge.amount.toLocaleString()} via <strong className="text-cyan-300">{hoveredEdge.channel}</strong>
+                    </span>
+                  </div>
+                  <div className="pl-3 border-l border-white/10">
+                    <span className="text-slate-400 text-[10px] uppercase block">RISK SCORE</span>
+                    <span className={`font-black ${hoveredEdge.risk_score >= 70 ? 'text-rose-400' : 'text-amber-300'}`}>
+                      {hoveredEdge.risk_score}/100 ({hoveredEdge.pattern_type})
+                    </span>
+                  </div>
+                </>
+              )}
+              {!hoveredEdge && hoveredNode && (
+                <>
+                  <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <div>
+                    <span className="text-slate-400 text-[10px] uppercase block">ENTITY HOVER</span>
+                    <span className="text-white font-bold">
+                      {hoveredNode.account_number} ({hoveredNode.holder_name})
+                    </span>
+                  </div>
+                  <div className="pl-3 border-l border-white/10">
+                    <span className="text-slate-400 text-[10px] uppercase block">CLASSIFICATION</span>
+                    <span className={`font-black ${hoveredNode.is_mule ? 'text-rose-400' : 'text-emerald-300'}`}>
+                      {hoveredNode.is_mule ? `MULE [${hoveredNode.mule_ring_id || 'FLAGGED'}]` : 'STANDARD ENTITY'}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Legend Overlay */}
           <div className="absolute top-4 left-4 z-10 bg-slate-900/60 border border-white/10 backdrop-blur-2xl rounded-xl p-3.5 text-[11px] font-mono text-slate-300 space-y-1.5 shadow-glass pointer-events-none">
@@ -260,15 +325,26 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
             </div>
           </div>
 
-          {/* SVG Canvas */}
+          {/* SVG Canvas with 3D Matrix Transform */}
           <svg
             className="w-full h-full"
             style={{
-              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+              transform: is3DView
+                ? `perspective(1200px) rotateX(24deg) rotateZ(-6deg) translate3d(${pan.x}px, ${pan.y}px, 0px) scale(${zoom * 0.95})`
+                : `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
               transformOrigin: 'center center',
+              transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)',
             }}
           >
             <defs>
+              <filter id="glow-danger" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+              <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
               <marker
                 id="arrowhead"
                 markerWidth="8"
@@ -291,35 +367,54 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
               </marker>
             </defs>
 
-            {/* Directed Edges */}
+            {/* Directed Edges with Streaming Laser Animations & Hover */}
             {graphData?.edges.map((edge) => {
               const srcPos = nodePosMap.get(edge.source);
               const tgtPos = nodePosMap.get(edge.target);
               if (!srcPos || !tgtPos) return null;
 
               const isSuspicious = edge.is_flagged || edge.risk_score >= 60;
+              const isEdgeHovered = hoveredEdge?.id === edge.id;
 
               return (
-                <g key={edge.id} className="transition-opacity duration-300">
+                <g
+                  key={edge.id}
+                  className="cursor-pointer"
+                  onMouseEnter={() => setHoveredEdge(edge)}
+                  onMouseLeave={() => setHoveredEdge(null)}
+                >
+                  {/* Invisible thicker stroke for effortless mouse hovering */}
                   <line
                     x1={srcPos.x}
                     y1={srcPos.y}
                     x2={tgtPos.x}
                     y2={tgtPos.y}
-                    stroke={isSuspicious ? '#f43f5e' : 'rgba(255, 255, 255, 0.12)'}
-                    strokeWidth={isSuspicious ? 2 : 1}
-                    strokeDasharray={edge.pattern_type === 'CIRCULAR_FLOW' ? '4 2' : undefined}
-                    opacity={isSuspicious ? 0.85 : 0.4}
+                    stroke="transparent"
+                    strokeWidth={14}
+                  />
+
+                  {/* Visible Streaming Laser Line */}
+                  <line
+                    x1={srcPos.x}
+                    y1={srcPos.y}
+                    x2={tgtPos.x}
+                    y2={tgtPos.y}
+                    stroke={isSuspicious ? '#f43f5e' : (isEdgeHovered ? '#00f2fe' : 'rgba(255, 255, 255, 0.16)')}
+                    strokeWidth={isEdgeHovered ? 3.5 : (isSuspicious ? 2.5 : 1)}
+                    className={isSuspicious ? 'edge-flow-danger' : 'edge-flow-normal'}
+                    filter={isSuspicious ? 'url(#glow-danger)' : (isEdgeHovered ? 'url(#glow-cyan)' : undefined)}
+                    opacity={isEdgeHovered ? 1 : (isSuspicious ? 0.95 : 0.4)}
                     markerEnd={isSuspicious ? 'url(#arrowhead-danger)' : 'url(#arrowhead)'}
                   />
                 </g>
               );
             })}
 
-            {/* Nodes */}
+            {/* 3D Holographic Nodes */}
             {positionedNodes.map((node) => {
               const highlighted = isNodeHighlighted(node);
               const isSelected = selectedNode?.id === node.id;
+              const isHovered = hoveredNode?.id === node.id;
               const isCritical = node.risk_level === 'CRITICAL' || node.is_mule;
               const isHigh = node.risk_level === 'HIGH';
 
@@ -339,19 +434,21 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
               return (
                 <g
                   key={node.id}
-                  transform={`translate(${node.x}, ${node.y})`}
+                  transform={`translate(${node.x}, ${node.y}) ${isHovered ? 'scale(1.25)' : ''}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedNode(node);
                   }}
+                  onMouseEnter={() => setHoveredNode(node)}
+                  onMouseLeave={() => setHoveredNode(null)}
                   className={`cursor-pointer transition-all duration-300 ${
                     highlighted ? 'opacity-100' : 'opacity-15'
                   }`}
                 >
                   {/* Outer Pulsing Halo */}
-                  {(isCritical || isSelected) && (
+                  {(isCritical || isSelected || isHovered) && (
                     <circle
-                      r={isSelected ? 26 : 20}
+                      r={isSelected || isHovered ? 28 : 20}
                       fill="none"
                       stroke={nodeColor}
                       strokeWidth="2"
@@ -362,10 +459,11 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
 
                   {/* Halo fill */}
                   <circle
-                    r={isSelected ? 22 : 16}
+                    r={isSelected || isHovered ? 22 : 16}
                     fill={haloColor}
-                    stroke={isSelected ? '#00f2fe' : nodeColor}
-                    strokeWidth={isSelected ? 3 : 1.5}
+                    stroke={isSelected || isHovered ? '#00f2fe' : nodeColor}
+                    strokeWidth={isSelected || isHovered ? 3 : 1.5}
+                    filter={isCritical ? 'url(#glow-danger)' : undefined}
                   />
 
                   {/* Inner Core */}
@@ -375,10 +473,10 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
                   <text
                     y={24}
                     textAnchor="middle"
-                    fill={isSelected ? '#00f2fe' : '#f8fafc'}
+                    fill={isSelected || isHovered ? '#00f2fe' : '#f8fafc'}
                     fontSize="10"
                     fontFamily="monospace"
-                    fontWeight={isSelected ? 'bold' : 'normal'}
+                    fontWeight={isSelected || isHovered ? 'bold' : 'normal'}
                     className="pointer-events-none drop-shadow-md"
                   >
                     {node.account_number}
@@ -387,7 +485,7 @@ export const NetworkGraphView: React.FC<NetworkGraphViewProps> = ({ onNavigateTo
                   {/* Subtitle / Mule Ring */}
                   {node.mule_ring_id && (
                     <text
-                      y={34}
+                      y={35}
                       textAnchor="middle"
                       fill="#f43f5e"
                       fontSize="8"

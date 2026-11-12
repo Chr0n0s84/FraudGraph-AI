@@ -175,8 +175,12 @@ export const LiveTransactions: React.FC<LiveTransactionsProps> = ({
                 <tr
                   key={tx.id}
                   onClick={() => handleRowClick(tx)}
-                  className={`hover:bg-white/[0.05] cursor-pointer transition-colors ${
-                    tx.risk_level === 'CRITICAL' ? 'bg-rose-950/20' : ''
+                  className={`hover:bg-white/[0.08] hover:translate-x-1 cursor-pointer transition-all duration-200 border-l-2 ${
+                    tx.risk_level === 'CRITICAL'
+                      ? 'bg-rose-950/25 border-l-rose-500 hover:shadow-[0_4px_20px_rgba(244,63,94,0.18)]'
+                      : tx.risk_level === 'HIGH'
+                      ? 'bg-amber-950/15 border-l-amber-500 hover:shadow-[0_4px_20px_rgba(245,158,11,0.15)]'
+                      : 'border-l-transparent hover:border-l-cyan-400 hover:shadow-[0_4px_20px_rgba(0,242,254,0.12)]'
                   }`}
                 >
                   <td className="py-3.5 px-4 text-slate-400 whitespace-nowrap">

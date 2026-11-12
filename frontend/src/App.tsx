@@ -197,20 +197,20 @@ export function App() {
       )}
 
       {/* Top Glassmorphic Navbar */}
-      <header className="sticky top-0 z-40 bg-slate-950/60 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+      <header className="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
         <div className="max-w-[1720px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
-            {/* Brand Logo */}
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shadow-[0_0_20px_rgba(0,242,254,0.3)] backdrop-blur-md">
-                <Network className="w-5 h-5 animate-pulse-slow" />
+            {/* Brand Logo with 3D Float */}
+            <div className="flex items-center gap-3.5 group cursor-pointer">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400/25 via-blue-600/20 to-purple-600/30 border border-cyan-400/50 flex items-center justify-center text-cyan-300 shadow-[0_0_25px_rgba(0,242,254,0.35)] backdrop-blur-md animate-float-3d group-hover:scale-105 transition-transform duration-300">
+                <Network className="w-5 h-5 animate-pulse-slow text-cyan-300" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-base font-extrabold font-mono tracking-wider text-white flex items-center gap-1.5">
-                    FRAUDGRAPH <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-black">AI</span>
+                    FRAUDGRAPH <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400 font-black text-shimmer">AI</span>
                   </h1>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-950/90 text-cyan-300 border border-cyan-400/50 shadow-[0_0_12px_rgba(0,242,254,0.25)]">
                     ENTERPRISE AML
                   </span>
                 </div>
@@ -220,16 +220,16 @@ export function App() {
               </div>
             </div>
 
-            {/* Live Telemetry Glass Pills */}
+            {/* Live Telemetry Glass Pills with 3D Depth */}
             <div className="hidden md:flex items-center gap-3 font-mono text-xs">
-              <div className="flex items-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-xl px-3.5 py-1.5 shadow-glass">
-                <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 shadow-[0_0_8px_#34d399] animate-ping' : 'bg-rose-500'}`} />
+              <div className="flex items-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-xl px-3.5 py-1.5 shadow-glass hover:border-cyan-400/30 transition-all hover:-translate-y-0.5">
+                <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 shadow-[0_0_10px_#34d399] animate-ping' : 'bg-rose-500'}`} />
                 <span className="text-slate-300 text-[11px]">
                   WebSocket: <strong className={isConnected ? 'text-emerald-300' : 'text-rose-400'}>{isConnected ? 'LIVE FEED' : 'OFFLINE'}</strong>
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-xl px-3.5 py-1.5 shadow-glass">
+              <div className="flex items-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-xl px-3.5 py-1.5 shadow-glass hover:border-cyan-400/30 transition-all hover:-translate-y-0.5">
                 <span className="text-slate-300 text-[11px]">
                   Simulator: <strong className={isSimulating ? 'text-cyan-300 font-bold' : 'text-amber-400 font-bold'}>{isSimulating ? '2000ms TX STREAM' : 'PAUSED'}</strong>
                 </span>
@@ -237,7 +237,7 @@ export function App() {
             </div>
           </div>
 
-          {/* Module Navigation Tabs */}
+          {/* Module Navigation Tabs with 3D Hover Depth */}
           <nav className="flex items-center gap-1.5 overflow-x-auto py-2.5 border-t border-white/[0.06] scrollbar-none">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -247,17 +247,17 @@ export function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-medium whitespace-nowrap transition-all duration-300 ${
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-medium whitespace-nowrap transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 ${
                     isActive
-                      ? 'bg-gradient-to-r from-cyan-500/20 via-blue-500/15 to-purple-500/15 text-white font-bold border border-cyan-400/50 shadow-[0_0_20px_rgba(0,242,254,0.25)] backdrop-blur-md'
-                      : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04] border border-transparent'
+                      ? 'bg-gradient-to-r from-cyan-500/25 via-blue-500/20 to-purple-500/20 text-white font-bold border border-cyan-400/60 shadow-[0_0_25px_rgba(0,242,254,0.3)] backdrop-blur-md'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.06] border border-transparent hover:border-white/10 hover:shadow-[0_4px_15px_rgba(0,0,0,0.3)]'
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-300' : 'text-slate-400'}`} />
                   <span>{tab.label}</span>
                   {tab.badge !== undefined && tab.badge > 0 && (
                     <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      isActive ? 'bg-cyan-400 text-slate-950' : 'bg-rose-500/80 text-white shadow-[0_0_8px_rgba(244,63,94,0.4)]'
+                      isActive ? 'bg-cyan-400 text-slate-950 shadow-[0_0_8px_rgba(0,242,254,0.5)]' : 'bg-rose-500/80 text-white shadow-[0_0_8px_rgba(244,63,94,0.4)]'
                     }`}>
                       {tab.badge}
                     </span>

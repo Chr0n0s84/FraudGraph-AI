@@ -132,10 +132,10 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
           return (
             <div
               key={alert.id}
-              className={`rounded-2xl border p-5 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 backdrop-blur-2xl shadow-glass ${
+              className={`rounded-2xl border p-5 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 backdrop-blur-2xl shadow-glass cursor-pointer ${
                 isCritical
-                  ? 'border-rose-500/40 bg-gradient-to-r from-rose-950/30 via-slate-900/60 to-slate-950/70 shadow-[0_8px_30px_rgba(244,63,94,0.1)]'
-                  : 'border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-950/70 hover:border-cyan-400/30'
+                  ? 'border-rose-500/40 bg-gradient-to-r from-rose-950/30 via-slate-900/60 to-slate-950/70 card-3d-danger shadow-[0_8px_30px_rgba(244,63,94,0.15)]'
+                  : 'border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-950/70 hover:border-cyan-400/40 card-3d'
               }`}
             >
               <div className="flex items-start gap-4">

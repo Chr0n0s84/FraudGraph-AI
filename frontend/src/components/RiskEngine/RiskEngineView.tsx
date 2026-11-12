@@ -140,7 +140,7 @@ export const RiskEngineView: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Input Sandbox Controls */}
-        <div className="lg:col-span-5 rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass space-y-5">
+        <div className="lg:col-span-5 rounded-2xl bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass space-y-5 card-3d">
           <h3 className="text-sm font-bold font-mono text-slate-100 uppercase tracking-wider text-cyan-400 flex items-center gap-2">
             <Sparkles className="w-4 h-4" /> 1. Simulation Parameters
           </h3>
@@ -253,7 +253,7 @@ export const RiskEngineView: React.FC = () => {
         {/* Right: Output Score Breakdown & Explainability */}
         <div className="lg:col-span-7 space-y-5">
           {/* Main Risk Gauge Card */}
-          <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass card-3d">
             <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/[0.08]">
               <div>
                 <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block mb-1 font-semibold">

@@ -162,10 +162,10 @@ export const CaseManagementView: React.FC<CaseManagementViewProps> = ({
                   <div
                     key={c.id}
                     onClick={() => handleSelectCase(c.id)}
-                    className={`bg-white/[0.03] hover:bg-white/[0.07] border rounded-2xl p-4 transition-all duration-300 cursor-pointer space-y-2.5 shadow-sm ${
+                    className={`bg-white/[0.03] hover:bg-white/[0.08] border rounded-2xl p-4 transition-all duration-300 cursor-pointer space-y-2.5 shadow-sm hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(0,242,254,0.18)] ${
                       selectedCase?.id === c.id
-                        ? 'border-cyan-400 shadow-[0_0_15px_rgba(0,242,254,0.3)]'
-                        : 'border-white/10 hover:border-slate-500'
+                        ? 'border-cyan-400 shadow-[0_0_20px_rgba(0,242,254,0.35)]'
+                        : 'border-white/10 hover:border-cyan-400/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">

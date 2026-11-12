@@ -278,7 +278,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Two Column Section: Priority Flagged Entities & Recent Live Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Suspicious Accounts Leaderboard */}
-        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass card-3d">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-mono font-bold text-slate-100 flex items-center gap-2">
@@ -289,9 +289,9 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             </div>
             <button
               onClick={() => onNavigateTab('network')}
-              className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+              className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors group"
             >
-              Explore Topology <ArrowUpRight className="w-3.5 h-3.5" />
+              Explore Topology <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>
           </div>
 
@@ -300,10 +300,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               <div
                 key={acc.id}
                 onClick={() => onNavigateTab('investigator', { accountId: acc.id })}
-                className="bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-cyan-400/50 rounded-xl p-3.5 transition-all cursor-pointer flex items-center justify-between group shadow-sm"
+                className="bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-cyan-400/50 rounded-xl p-3.5 transition-all duration-300 cursor-pointer flex items-center justify-between group shadow-sm hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,242,254,0.15)]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-slate-950/80 border border-white/10 flex items-center justify-center font-mono font-bold text-xs text-slate-300 group-hover:text-cyan-400 group-hover:border-cyan-400/50 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-slate-950/80 border border-white/10 flex items-center justify-center font-mono font-bold text-xs text-slate-300 group-hover:text-cyan-400 group-hover:border-cyan-400/50 group-hover:scale-110 transition-all">
                     {acc.id}
                   </div>
                   <div>
@@ -325,7 +325,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </div>
 
         {/* Live Critical Alerts Stream */}
-        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass card-3d">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-mono font-bold text-slate-100 flex items-center gap-2">
@@ -336,9 +336,9 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             </div>
             <button
               onClick={() => onNavigateTab('alerts')}
-              className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+              className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors group"
             >
-              All Alerts <ArrowUpRight className="w-3.5 h-3.5" />
+              All Alerts <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>
           </div>
 
@@ -346,10 +346,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             {latestAlerts.slice(0, 4).map((alert) => (
               <div
                 key={alert.id}
-                className="bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-rose-500/50 rounded-xl p-3.5 transition-all flex items-start justify-between gap-3 shadow-sm"
+                className="bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-rose-500/50 rounded-xl p-3.5 transition-all duration-300 flex items-start justify-between gap-3 shadow-sm hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(244,63,94,0.18)]"
               >
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-400 shrink-0 mt-0.5">
+                  <div className="p-2 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-400 shrink-0 mt-0.5 shadow-[0_0_12px_rgba(244,63,94,0.3)]">
                     <AlertOctagon className="w-4 h-4" />
                   </div>
                   <div>
@@ -371,7 +371,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                   <RiskBadge level={alert.severity} score={alert.risk_score} />
                   <button
                     onClick={() => onNavigateTab('alerts')}
-                    className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-cyan-300 bg-cyan-950/60 border border-cyan-500/40 hover:bg-cyan-900/60 transition-colors"
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-cyan-300 bg-cyan-950/60 border border-cyan-500/40 hover:bg-cyan-900/60 hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,242,254,0.15)]"
                   >
                     Triage
                   </button>

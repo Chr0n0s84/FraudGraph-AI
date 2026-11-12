@@ -114,7 +114,7 @@ export const DetectionEngineView: React.FC = () => {
           {typologies.map((t) => (
             <div
               key={t.id}
-              className={`rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass flex flex-col justify-between hover:border-cyan-400/40 transition-all duration-300 group`}
+              className={`rounded-2xl bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass flex flex-col justify-between hover:border-cyan-400/50 transition-all duration-300 group card-3d frost-shine cursor-pointer`}
             >
               <div>
                 <div className="flex items-start justify-between gap-2 mb-3">

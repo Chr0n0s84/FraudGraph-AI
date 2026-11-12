@@ -104,7 +104,7 @@ export const AnalyticsReportsView: React.FC = () => {
           </div>
 
           {/* Mule Rings Breakdown Table */}
-          <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900/60 to-slate-950/70 backdrop-blur-2xl border border-white/10 p-6 shadow-glass card-3d">
             <h3 className="text-sm font-bold font-mono text-slate-100 mb-4 flex items-center gap-2">
               <Network className="w-4 h-4 text-cyan-400" />
               Identified Mule Account Rings & Syndicates
@@ -124,7 +124,7 @@ export const AnalyticsReportsView: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-white/[0.05]">
                   {metrics.mule_rings.map((ring) => (
-                    <tr key={ring.ring_id} className="hover:bg-white/[0.04]">
+                    <tr key={ring.ring_id} className="hover:bg-white/[0.08] hover:translate-x-1 transition-all duration-200">
                       <td className="py-3.5 px-4 font-bold text-rose-400">
                         {ring.ring_id}
                       </td>
