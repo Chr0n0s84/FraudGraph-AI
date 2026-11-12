@@ -15,12 +15,13 @@ import {
   isOfflineMode,
   subscribeOfflineMode,
 } from './api.js';
-import { Transaction, Alert, GraphData, AccountDossier, Stats } from './types.ts';
+import { Transaction, Alert, GraphData, AccountDossier, Stats, CaseStatus } from './types.ts';
 import { Header } from './components/Header.tsx';
 import { Sidebar } from './components/Sidebar.tsx';
 import { NetworkGraph } from './components/NetworkGraph.tsx';
 import { TransactionsTable } from './components/TransactionsTable.tsx';
 import { AlertsPanel } from './components/AlertsPanel.tsx';
+import { CasesList } from './components/CasesList.tsx';
 import { AnalyticsCharts } from './components/AnalyticsCharts.tsx';
 import { AccountDrawer } from './components/AccountDrawer.tsx';
 
@@ -31,6 +32,9 @@ export default function App() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<AccountDossier | null>(null);
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const [accountStatuses, setAccountStatuses] = useState<Record<string, CaseStatus>>({});
+  const accountStatusesRef = useRef<Record<string, CaseStatus>>({});
+  const selectedAccountIdRef = useRef<string | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isOffline, setIsOffline] = useState<boolean>(() => isOfflineMode());
@@ -39,7 +43,7 @@ export default function App() {
   const hasLoadedTxRef = useRef<boolean>(false);
   const flashTimersRef = useRef<number[]>([]);
   const [isDrawerLoading, setIsDrawerLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'graph' | 'transactions' | 'alerts' | 'analytics'>('graph');
+  const [activeTab, setActiveTab] = useState<'graph' | 'transactions' | 'alerts' | 'cases' | 'analytics'>('graph');
   const [riskFilter, setRiskFilter] = useState<'all' | 'high' | 'suspicious' | 'normal'>('all');
   const [highlightPreset, setHighlightPreset] = useState<'cycle' | 'fan-in' | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(
@@ -79,6 +83,57 @@ export default function App() {
     setTransactions(txRes);
   }, []);
 
+  const applyAlerts = useCallback((alertsRes: Alert[]) => {
+    const nextStatuses: Record<string, CaseStatus> = { ...accountStatusesRef.current };
+    const mergedAlerts = alertsRes.map((alert) => {
+      const known = nextStatuses[alert.account_id];
+      if (known && alert.case_status === 'open' && known !== 'open') {
+        return { ...alert, case_status: known };
+      }
+      nextStatuses[alert.account_id] = alert.case_status;
+      return alert;
+    });
+
+    accountStatusesRef.current = nextStatuses;
+    setAccountStatuses(nextStatuses);
+    setAlerts(mergedAlerts);
+
+    const activeId = selectedAccountIdRef.current;
+    if (activeId && nextStatuses[activeId]) {
+      const nextStatus = nextStatuses[activeId];
+      setSelectedAccount((prev) =>
+        prev && prev.account_id === activeId && prev.case_status !== nextStatus
+          ? { ...prev, case_status: nextStatus }
+          : prev
+      );
+    }
+  }, []);
+
+  const applyCaseStatus = useCallback((accountId: string, caseStatus: CaseStatus) => {
+    accountStatusesRef.current = {
+      ...accountStatusesRef.current,
+      [accountId]: caseStatus,
+    };
+    setAccountStatuses((prev) => ({
+      ...prev,
+      [accountId]: caseStatus,
+    }));
+    setAlerts((prev) =>
+      prev.map((alert) =>
+        alert.account_id === accountId ? { ...alert, case_status: caseStatus } : alert
+      )
+    );
+    setGraphData((prev) => ({
+      ...prev,
+      nodes: prev.nodes.map((node) =>
+        node.id === accountId ? { ...node, case_status: caseStatus } : node
+      ),
+    }));
+    setSelectedAccount((prev) =>
+      prev && prev.account_id === accountId ? { ...prev, case_status: caseStatus } : prev
+    );
+  }, []);
+
   // Load all initial data via api.js
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -92,13 +147,13 @@ export default function App() {
       setStats(statsRes);
       setGraphData(graphRes);
       applyTransactions(txRes);
-      setAlerts(alertsRes);
+      applyAlerts(alertsRes);
     } catch (err) {
       console.error('Failed to load forensic data from api.js:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [applyTransactions]);
+  }, [applyTransactions, applyAlerts]);
 
   useEffect(() => {
     setIsOffline(isOfflineMode());
@@ -125,7 +180,7 @@ export default function App() {
         ]);
         if (!isMounted) return;
         applyTransactions(txRes);
-        setAlerts(alertsRes);
+        applyAlerts(alertsRes);
         setStats(statsRes);
       } catch (err) {
         console.error('Failed to poll forensic telemetry from api.js:', err);
@@ -139,7 +194,7 @@ export default function App() {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [applyTransactions]);
+  }, [applyTransactions, applyAlerts]);
 
   // Poll getGraph() every 5s
   useEffect(() => {
@@ -176,11 +231,13 @@ export default function App() {
 
   // Select and drill down to account
   const handleSelectAccount = useCallback(async (accountId: string) => {
+    selectedAccountIdRef.current = accountId;
     setSelectedAccountId(accountId);
     setIsDrawerLoading(true);
     try {
       const acc = await getAccount(accountId);
-      setSelectedAccount(acc);
+      const knownStatus = acc.case_status ?? accountStatusesRef.current[accountId] ?? 'open';
+      setSelectedAccount({ ...acc, case_status: knownStatus });
     } catch (err) {
       console.error('Failed to get account dossier:', err);
     } finally {
@@ -192,38 +249,56 @@ export default function App() {
   const handleFreezeAccount = useCallback(
     async (accountId: string) => {
       try {
-        await freezeAccount(accountId);
-        // Refresh alerts and active account
+        const res = await freezeAccount(accountId);
+        const targetId = res?.account_id || accountId;
+        const returnedStatus: CaseStatus = res?.case_status || 'frozen';
+        applyCaseStatus(targetId, returnedStatus);
+
+        // Refresh alerts and active account while preserving returned case_status
         const [updatedAlerts, updatedAcc] = await Promise.all([
           getAlerts(),
-          getAccount(accountId),
+          selectedAccountIdRef.current === targetId ? getAccount(targetId) : Promise.resolve(null),
         ]);
-        setAlerts(updatedAlerts);
-        setSelectedAccount(updatedAcc);
+        applyAlerts(updatedAlerts);
+        if (updatedAcc && selectedAccountIdRef.current === targetId) {
+          setSelectedAccount({
+            ...updatedAcc,
+            case_status: returnedStatus,
+          });
+        }
       } catch (err) {
         console.error('Failed to freeze account:', err);
       }
     },
-    []
+    [applyCaseStatus, applyAlerts]
   );
 
   // Escalate action
   const handleEscalateAccount = useCallback(
     async (accountId: string) => {
       try {
-        await escalateAccount(accountId);
-        // Refresh alerts and active account
+        const res = await escalateAccount(accountId);
+        const targetId = res?.account_id || accountId;
+        const returnedStatus: CaseStatus = res?.case_status || 'escalated';
+        applyCaseStatus(targetId, returnedStatus);
+
+        // Refresh alerts and active account while preserving returned case_status
         const [updatedAlerts, updatedAcc] = await Promise.all([
           getAlerts(),
-          getAccount(accountId),
+          selectedAccountIdRef.current === targetId ? getAccount(targetId) : Promise.resolve(null),
         ]);
-        setAlerts(updatedAlerts);
-        setSelectedAccount(updatedAcc);
+        applyAlerts(updatedAlerts);
+        if (updatedAcc && selectedAccountIdRef.current === targetId) {
+          setSelectedAccount({
+            ...updatedAcc,
+            case_status: returnedStatus,
+          });
+        }
       } catch (err) {
         console.error('Failed to escalate account:', err);
       }
     },
-    []
+    [applyCaseStatus, applyAlerts]
   );
 
   // Preset selection (Cycle vs Fan-in)
@@ -261,6 +336,13 @@ export default function App() {
           riskFilter={riskFilter}
           setRiskFilter={setRiskFilter}
           onSelectPreset={handleSelectPreset}
+          openAlertsCount={alerts.filter((a) => a.case_status === 'open').length}
+          casesCount={
+            alerts.length +
+            Object.entries(accountStatuses).filter(
+              ([id, status]) => status !== 'open' && !alerts.some((a) => a.account_id === id)
+            ).length
+          }
           isCollapsed={isSidebarCollapsed}
           setIsCollapsed={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
@@ -272,6 +354,7 @@ export default function App() {
               <NetworkGraph
                 graphData={graphData}
                 selectedAccountId={selectedAccountId}
+                accountStatuses={accountStatuses}
                 onSelectAccount={handleSelectAccount}
                 riskFilter={riskFilter}
                 highlightPreset={highlightPreset}
@@ -297,6 +380,17 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'cases' && (
+            <CasesList
+              alerts={alerts}
+              accountStatuses={accountStatuses}
+              graphNodes={graphData.nodes}
+              onSelectAccount={handleSelectAccount}
+              onFreezeAccount={handleFreezeAccount}
+              onEscalateAccount={handleEscalateAccount}
+            />
+          )}
+
           {activeTab === 'analytics' && (
             <AnalyticsCharts transactions={transactions} alerts={alerts} />
           )}
@@ -307,6 +401,7 @@ export default function App() {
           account={selectedAccount}
           isLoading={isDrawerLoading}
           onClose={() => {
+            selectedAccountIdRef.current = null;
             setSelectedAccount(null);
             setSelectedAccountId(null);
           }}

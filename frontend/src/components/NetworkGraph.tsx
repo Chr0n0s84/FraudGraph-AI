@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import ForceGraph2D, { ForceGraphMethods } from 'react-force-graph-2d';
-import { GraphData, GraphNode, NodeRisk } from '../types.ts';
+import { CaseStatus, GraphData, GraphNode, NodeRisk } from '../types.ts';
 import { ZoomInIcon, ZoomOutIcon, Maximize2Icon, AlertTriangleIcon } from './Icons.tsx';
 
 interface NetworkGraphProps {
   graphData: GraphData;
   selectedAccountId: string | null;
+  accountStatuses?: Record<string, CaseStatus>;
   onSelectAccount: (accountId: string) => void;
   riskFilter: 'all' | 'high' | 'suspicious' | 'normal';
   highlightPreset: 'cycle' | 'fan-in' | null;
@@ -15,6 +16,7 @@ interface NetworkGraphProps {
 export function NetworkGraph({
   graphData,
   selectedAccountId,
+  accountStatuses,
   onSelectAccount,
   riskFilter,
   highlightPreset,
@@ -27,6 +29,8 @@ export function NetworkGraph({
   const cameraSnapshotRef = useRef<{ zoom: number; center: { x: number; y: number } } | null>(null);
   const lastCenteredPresetRef = useRef<'cycle' | 'fan-in' | null>(null);
   const lastCenteredAccountRef = useRef<string | null>(null);
+  const hasZoomedToFitRef = useRef<boolean>(false);
+  const hasSettledRef = useRef<boolean>(false);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
 
@@ -45,6 +49,22 @@ export function NetworkGraph({
     const observer = new ResizeObserver(updateDimensions);
     observer.observe(containerRef.current);
     return () => observer.disconnect();
+  }, []);
+
+  // Configure d3 forces so nodes spread out cleanly instead of clumping
+  useEffect(() => {
+    const fg = fgRef.current;
+    if (!fg) return;
+
+    const chargeForce = fg.d3Force('charge');
+    if (chargeForce && typeof chargeForce.strength === 'function') {
+      chargeForce.strength(-200);
+    }
+
+    const linkForce = fg.d3Force('link');
+    if (linkForce && typeof linkForce.distance === 'function') {
+      linkForce.distance(75);
+    }
   }, []);
 
   // Incrementally merge graphData while preserving existing node objects, positions, and zoom
@@ -70,6 +90,7 @@ export function NetworkGraph({
       if (existing) {
         existing.risk = n.risk;
         existing.score = n.score;
+        if (n.case_status !== undefined) existing.case_status = n.case_status;
         if (n.cluster !== undefined) existing.cluster = n.cluster;
       } else {
         const created: any = { ...n };
@@ -147,10 +168,12 @@ export function NetworkGraph({
         cameraSnapshotRef.current = { zoom: currentZoom, center: currentCenter };
       }
 
-      for (const n of nodes) {
-        if (!newlyAddedNodes.includes(n) && Number.isFinite(n.x) && Number.isFinite(n.y)) {
-          n.fx = n.x;
-          n.fy = n.y;
+      if (hasSettledRef.current) {
+        for (const n of nodes) {
+          if (!newlyAddedNodes.includes(n) && Number.isFinite(n.x) && Number.isFinite(n.y)) {
+            n.fx = n.x;
+            n.fy = n.y;
+          }
         }
       }
     }
@@ -197,6 +220,7 @@ export function NetworkGraph({
       const cycleNode = filteredData.nodes.find((n) => n.id === 'A101');
       if (cycleNode && Number.isFinite(cycleNode.x) && Number.isFinite(cycleNode.y)) {
         lastCenteredPresetRef.current = highlightPreset;
+        hasZoomedToFitRef.current = true;
         fgRef.current.centerAt(cycleNode.x, cycleNode.y, 800);
         fgRef.current.zoom(2.5, 800);
       }
@@ -205,6 +229,7 @@ export function NetworkGraph({
       const hubNode = filteredData.nodes.find((n) => n.id === 'A4821');
       if (hubNode && Number.isFinite(hubNode.x) && Number.isFinite(hubNode.y)) {
         lastCenteredPresetRef.current = highlightPreset;
+        hasZoomedToFitRef.current = true;
         fgRef.current.centerAt(hubNode.x, hubNode.y, 800);
         fgRef.current.zoom(2.5, 800);
       }
@@ -221,6 +246,7 @@ export function NetworkGraph({
     const targetNode = filteredData.nodes.find((n) => n.id === selectedAccountId);
     if (targetNode && Number.isFinite(targetNode.x) && Number.isFinite(targetNode.y)) {
       lastCenteredAccountRef.current = selectedAccountId;
+      hasZoomedToFitRef.current = true;
       fgRef.current.centerAt(targetNode.x, targetNode.y, 600);
       fgRef.current.zoom(2.2, 600);
     }
@@ -244,22 +270,21 @@ export function NetworkGraph({
       const isHovered = hoveredNode?.id === node.id;
       const isCycleNode = ['A101', 'A102', 'A103', 'A104', 'A105'].includes(node.id);
       const isHubNode = node.id === 'A4821';
+      const caseStatus: CaseStatus | undefined = node.case_status || accountStatuses?.[node.id];
+      const isFrozen = caseStatus === 'frozen';
+      const isEscalated = caseStatus === 'escalated';
 
-      const radius = isHubNode ? 10 : isCycleNode ? 8 : node.risk === 'high' ? 7 : node.risk === 'suspicious' ? 6 : 5;
+      const score = Math.max(0, Math.min(100, Number(node.score) || 0));
+      const radius = 4 + (score / 100) * 4;
 
-      // Outer radial glow for threats and selected
-      if (node.risk === 'high' || isSelected) {
-        const glowRadius = Math.max(1, radius + (isSelected ? 10 : 7));
+      // Outer radial glow for selected, escalated, and threats (frozen stays muted grey)
+      if (isSelected) {
+        const glowRadius = Math.max(1, radius + 5);
         const innerRadius = Math.max(0.1, radius * 0.5);
         try {
           const gradient = ctx.createRadialGradient(node.x, node.y, innerRadius, node.x, node.y, glowRadius);
-          if (isSelected) {
-            gradient.addColorStop(0, 'rgba(0, 242, 254, 0.8)');
-            gradient.addColorStop(1, 'rgba(0, 242, 254, 0)');
-          } else {
-            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.7)');
-            gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
-          }
+          gradient.addColorStop(0, 'rgba(0, 242, 254, 0.8)');
+          gradient.addColorStop(1, 'rgba(0, 242, 254, 0)');
           ctx.fillStyle = gradient;
           ctx.beginPath();
           ctx.arc(node.x, node.y, glowRadius, 0, 2 * Math.PI, false);
@@ -267,8 +292,36 @@ export function NetworkGraph({
         } catch {
           // Graceful fallback if gradient fails
         }
-      } else if (node.risk === 'suspicious') {
-        const glowRadius = Math.max(1, radius + 5);
+      } else if (!isFrozen && isEscalated) {
+        const glowRadius = Math.max(1, radius + 4);
+        const innerRadius = Math.max(0.1, radius * 0.5);
+        try {
+          const gradient = ctx.createRadialGradient(node.x, node.y, innerRadius, node.x, node.y, glowRadius);
+          gradient.addColorStop(0, 'rgba(168, 85, 247, 0.65)');
+          gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, glowRadius, 0, 2 * Math.PI, false);
+          ctx.fill();
+        } catch {
+          // Graceful fallback if gradient fails
+        }
+      } else if (!isFrozen && node.risk === 'high') {
+        const glowRadius = Math.max(1, radius + 4);
+        const innerRadius = Math.max(0.1, radius * 0.5);
+        try {
+          const gradient = ctx.createRadialGradient(node.x, node.y, innerRadius, node.x, node.y, glowRadius);
+          gradient.addColorStop(0, 'rgba(239, 68, 68, 0.7)');
+          gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, glowRadius, 0, 2 * Math.PI, false);
+          ctx.fill();
+        } catch {
+          // Graceful fallback if gradient fails
+        }
+      } else if (!isFrozen && node.risk === 'suspicious') {
+        const glowRadius = Math.max(1, radius + 3);
         const innerRadius = Math.max(0.1, radius * 0.5);
         try {
           const gradient = ctx.createRadialGradient(node.x, node.y, innerRadius, node.x, node.y, glowRadius);
@@ -283,11 +336,15 @@ export function NetworkGraph({
         }
       }
 
-      // Base solid circle: normal=blue, suspicious=orange, high=red
+      // Base solid circle: frozen=grey, escalated=purple, normal=blue, suspicious=orange, high=red
       ctx.beginPath();
       ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
 
-      if (node.risk === 'high') {
+      if (isFrozen) {
+        ctx.fillStyle = '#64748b';
+      } else if (isEscalated) {
+        ctx.fillStyle = '#a855f7';
+      } else if (node.risk === 'high') {
         ctx.fillStyle = '#ef4444';
       } else if (node.risk === 'suspicious') {
         ctx.fillStyle = '#f97316';
@@ -297,47 +354,84 @@ export function NetworkGraph({
       ctx.fill();
 
       // Inner glyph ring / border
-      ctx.lineWidth = isSelected ? 2.5 : 1.5;
-      ctx.strokeStyle = isSelected ? '#00f2fe' : '#080d1a';
+      ctx.lineWidth = isSelected ? 2 : 1.2;
+      ctx.strokeStyle = isSelected ? '#00f2fe' : isFrozen ? '#94a3b8' : '#080d1a';
       ctx.stroke();
 
-      // Double ring for high threats
-      if (node.risk === 'high') {
+      // Outer ring for frozen / escalated / high threats
+      if (isFrozen) {
         ctx.beginPath();
-        ctx.arc(node.x, node.y, radius + 2.5, 0, 2 * Math.PI, false);
-        ctx.lineWidth = 1;
+        ctx.arc(node.x, node.y, radius + 1.8, 0, 2 * Math.PI, false);
+        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.65)';
+        ctx.stroke();
+      } else if (isEscalated) {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, radius + 1.8, 0, 2 * Math.PI, false);
+        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.7)';
+        ctx.stroke();
+      } else if (node.risk === 'high') {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, radius + 1.8, 0, 2 * Math.PI, false);
+        ctx.lineWidth = 0.8;
         ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
         ctx.stroke();
       }
 
-      // Draw Account ID label when zoomed in or hovered
+      // Always draw FROZEN badge for frozen nodes, and draw Account ID label when zoomed/hovered/selected
       const validScale = Number.isFinite(globalScale) && globalScale > 0 ? globalScale : 1;
-      const fontSize = Math.max(9 / validScale, 3);
+      const fontSize = Math.max(8.5 / validScale, 2.8);
+      let nextTextY = node.y + radius + 2.5;
+
+      if (isFrozen) {
+        const badgeFontSize = Math.max(7 / validScale, 2.4);
+        ctx.font = `700 ${badgeFontSize}px 'JetBrains Mono', monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        const frozenText = 'FROZEN';
+        const badgeWidth = ctx.measureText(frozenText).width + 3;
+        const badgeHeight = badgeFontSize + 1.5;
+
+        ctx.fillStyle = 'rgba(51, 65, 85, 0.95)';
+        ctx.fillRect(node.x - badgeWidth / 2, nextTextY - 0.8, badgeWidth, badgeHeight);
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.8)';
+        ctx.strokeRect(node.x - badgeWidth / 2, nextTextY - 0.8, badgeWidth, badgeHeight);
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillText(frozenText, node.x, nextTextY);
+        nextTextY += badgeHeight + 1.5;
+      }
+
       if (validScale > 0.9 || isHovered || isSelected || isHubNode || isCycleNode) {
         ctx.font = `600 ${fontSize}px 'JetBrains Mono', monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
 
-        const textY = node.y + radius + 3;
         const text = node.id || '';
 
         // Label background badge
         const textWidth = ctx.measureText(text).width;
         ctx.fillStyle = 'rgba(8, 13, 26, 0.85)';
-        ctx.fillRect(node.x - textWidth / 2 - 2, textY - 1, textWidth + 4, fontSize + 2);
+        ctx.fillRect(node.x - textWidth / 2 - 2, nextTextY - 1, textWidth + 4, fontSize + 2);
 
         // Label text
         ctx.fillStyle = isSelected
           ? '#00f2fe'
+          : isFrozen
+          ? '#cbd5e1'
+          : isEscalated
+          ? '#d8b4fe'
           : node.risk === 'high'
           ? '#fca5a5'
           : node.risk === 'suspicious'
           ? '#fdba74'
           : '#93c5fd';
-        ctx.fillText(text, node.x, textY);
+        ctx.fillText(text, node.x, nextTextY);
       }
     },
-    [selectedAccountId, hoveredNode]
+    [selectedAccountId, hoveredNode, accountStatuses]
   );
 
   const drawPointerArea = useCallback((node: any, color: string, ctx: CanvasRenderingContext2D) => {
@@ -350,9 +444,11 @@ export function NetworkGraph({
     ) {
       return;
     }
+    const score = Math.max(0, Math.min(100, Number(node.score) || 0));
+    const radius = 4 + (score / 100) * 4;
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(node.x, node.y, 10, 0, 2 * Math.PI, false);
+    ctx.arc(node.x, node.y, radius + 3, 0, 2 * Math.PI, false);
     ctx.fill();
   }, []);
 
@@ -428,6 +524,14 @@ export function NetworkGraph({
           <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6] shadow-[0_0_8px_#3b82f6]" />
           <span className="text-[#f8fafc]">Normal (0-39)</span>
         </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#64748b] border border-[#94a3b8]" />
+          <span className="text-[#f8fafc]">Frozen</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#a855f7] shadow-[0_0_8px_#a855f7]" />
+          <span className="text-[#f8fafc]">Escalated</span>
+        </div>
         <span className="text-[#475569]">|</span>
         <span className="text-[#38bdf8]">Click any node to inspect dossier</span>
       </div>
@@ -483,8 +587,18 @@ export function NetworkGraph({
         onNodeHover={(node: any) => {
           setHoveredNode(node || null);
         }}
+        onEngineStop={() => {
+          if (filteredData.nodes.length > 0) {
+            hasSettledRef.current = true;
+            if (!hasZoomedToFitRef.current) {
+              hasZoomedToFitRef.current = true;
+              fgRef.current?.zoomToFit(400, 48);
+            }
+          }
+        }}
+        warmupTicks={50}
         cooldownTicks={120}
-        d3AlphaDecay={0.02}
+        d3AlphaDecay={0.025}
         d3VelocityDecay={0.3}
       />
     </div>

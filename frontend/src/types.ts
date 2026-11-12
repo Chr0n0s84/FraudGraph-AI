@@ -27,6 +27,7 @@ export interface GraphNode {
   id: string;
   risk: NodeRisk;
   score: number;
+  case_status?: CaseStatus;
   cluster?: string;
   x?: number;
   y?: number;

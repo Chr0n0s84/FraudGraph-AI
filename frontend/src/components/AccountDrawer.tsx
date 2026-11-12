@@ -117,11 +117,11 @@ export function AccountDrawer({
                 </h3>
                 <div>
                   {isFrozen ? (
-                    <span className="px-2 py-0.5 rounded bg-[rgba(56,189,248,0.2)] text-[#38bdf8] border border-[rgba(56,189,248,0.4)] text-xs font-mono-data font-bold flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded bg-[rgba(148,163,184,0.2)] text-[#cbd5e1] border border-[rgba(148,163,184,0.45)] text-xs font-mono-data font-bold flex items-center gap-1">
                       <LockIcon size={12} /> FROZEN
                     </span>
                   ) : isEscalated ? (
-                    <span className="px-2 py-0.5 rounded bg-[rgba(245,158,11,0.2)] text-[#f59e0b] border border-[rgba(245,158,11,0.4)] text-xs font-mono-data font-bold flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded bg-[rgba(168,85,247,0.2)] text-[#c084fc] border border-[rgba(168,85,247,0.45)] text-xs font-mono-data font-bold flex items-center gap-1">
                       <ArrowUpRightIcon size={12} /> ESCALATED
                     </span>
                   ) : (
@@ -233,7 +233,7 @@ export function AccountDrawer({
                   disabled={isFrozen}
                   className={`py-2 px-3 rounded text-xs font-mono-data font-bold flex items-center justify-center gap-1.5 transition-all ${
                     isFrozen
-                      ? 'bg-[#0f1c3f] text-[#38bdf8] border border-[#38bdf8]/40 cursor-not-allowed opacity-80'
+                      ? 'bg-[#1e293b] text-[#cbd5e1] border border-[#94a3b8]/50 cursor-not-allowed opacity-85'
                       : 'bg-[rgba(239,68,68,0.2)] hover:bg-[rgba(239,68,68,0.35)] text-[#f43f5e] border border-[#ef4444] glow-red shadow-lg'
                   }`}
                 >
@@ -246,8 +246,8 @@ export function AccountDrawer({
                   disabled={isEscalated}
                   className={`py-2 px-3 rounded text-xs font-mono-data font-bold flex items-center justify-center gap-1.5 transition-all ${
                     isEscalated
-                      ? 'bg-[#0f1c3f] text-[#f59e0b] border border-[#f59e0b]/40 cursor-not-allowed opacity-80'
-                      : 'bg-[rgba(245,158,11,0.2)] hover:bg-[rgba(245,158,11,0.35)] text-[#f59e0b] border border-[#f59e0b] glow-amber'
+                      ? 'bg-[#0f1c3f] text-[#c084fc] border border-[#a855f7]/50 cursor-not-allowed opacity-85'
+                      : 'bg-[rgba(168,85,247,0.18)] hover:bg-[rgba(168,85,247,0.32)] text-[#c084fc] border border-[#a855f7]'
                   }`}
                 >
                   <ArrowUpRightIcon size={14} />

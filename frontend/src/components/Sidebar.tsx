@@ -1,12 +1,14 @@
 import React from 'react';
-import { NetworkIcon, FileTextIcon, ShieldAlertIcon, ActivityIcon, FilterIcon, AlertTriangleIcon, CheckCircleIcon } from './Icons.tsx';
+import { NetworkIcon, FileTextIcon, ShieldAlertIcon, ActivityIcon, FilterIcon, LayersIcon, CheckCircleIcon } from './Icons.tsx';
 
 interface SidebarProps {
-  activeTab: 'graph' | 'transactions' | 'alerts' | 'analytics';
-  setActiveTab: (tab: 'graph' | 'transactions' | 'alerts' | 'analytics') => void;
+  activeTab: 'graph' | 'transactions' | 'alerts' | 'cases' | 'analytics';
+  setActiveTab: (tab: 'graph' | 'transactions' | 'alerts' | 'cases' | 'analytics') => void;
   riskFilter: 'all' | 'high' | 'suspicious' | 'normal';
   setRiskFilter: (filter: 'all' | 'high' | 'suspicious' | 'normal') => void;
   onSelectPreset: (preset: 'cycle' | 'fan-in') => void;
+  openAlertsCount?: number;
+  casesCount?: number;
   isCollapsed: boolean;
   setIsCollapsed: () => void;
 }
@@ -17,6 +19,8 @@ export function Sidebar({
   riskFilter,
   setRiskFilter,
   onSelectPreset,
+  openAlertsCount = 0,
+  casesCount = 0,
   isCollapsed,
   setIsCollapsed,
 }: SidebarProps) {
@@ -84,7 +88,26 @@ export function Sidebar({
                 <div className="flex items-center justify-between w-full">
                   <span>Alerts Feed</span>
                   <span className="px-1.5 py-0.2 rounded bg-[rgba(244,63,94,0.2)] text-[#f43f5e] text-[10px] border border-[rgba(244,63,94,0.4)]">
-                    8
+                    {openAlertsCount}
+                  </span>
+                </div>
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('cases')}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-mono-data transition-all text-left ${
+                activeTab === 'cases'
+                  ? 'bg-[#0f1c3f] text-[#00f2fe] border-l-2 border-[#00f2fe] font-semibold glow-cyan'
+                  : 'text-[#94a3b8] hover:text-[#f8fafc] hover:bg-[#0f1c3f]/50'
+              }`}
+            >
+              <LayersIcon size={16} className={activeTab === 'cases' ? 'text-[#00f2fe]' : 'text-[#94a3b8]'} />
+              {!isCollapsed && (
+                <div className="flex items-center justify-between w-full">
+                  <span>Cases</span>
+                  <span className="px-1.5 py-0.2 rounded bg-[rgba(56,189,248,0.18)] text-[#38bdf8] text-[10px] border border-[rgba(56,189,248,0.35)]">
+                    {casesCount}
                   </span>
                 </div>
               )}

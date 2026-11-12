@@ -48,9 +48,9 @@ export function AlertsPanel({
               key={alert.alert_id}
               className={`glass-panel p-4 rounded-lg border transition-all duration-200 relative overflow-hidden ${
                 isFrozen
-                  ? 'border-[#38bdf8]/40 bg-[#0b1329]/90'
+                  ? 'border-[#94a3b8]/50 bg-[#0b1329]/90'
                   : isEscalated
-                  ? 'border-[#f59e0b]/50 bg-[#0f1c3f]'
+                  ? 'border-[#a855f7]/50 bg-[#0f1c3f]'
                   : isHigh
                   ? 'border-[rgba(244,63,94,0.4)] hover:border-[#f43f5e] bg-[#0b1329]'
                   : 'border-[rgba(245,158,11,0.3)] hover:border-[#f59e0b]'
@@ -117,11 +117,11 @@ export function AlertsPanel({
                 <span>{alert.time.replace('T', ' ')}</span>
                 <div>
                   {isFrozen ? (
-                    <span className="inline-flex items-center gap-1 text-[#38bdf8] font-bold text-[11px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[rgba(148,163,184,0.18)] text-[#cbd5e1] border border-[rgba(148,163,184,0.45)] font-bold text-[11px]">
                       <LockIcon size={12} /> FROZEN
                     </span>
                   ) : isEscalated ? (
-                    <span className="inline-flex items-center gap-1 text-[#f59e0b] font-bold text-[11px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[rgba(168,85,247,0.18)] text-[#c084fc] border border-[rgba(168,85,247,0.45)] font-bold text-[11px]">
                       <ArrowUpRightIcon size={12} /> ESCALATED
                     </span>
                   ) : (
@@ -155,7 +155,7 @@ export function AlertsPanel({
                 {!isEscalated && (
                   <button
                     onClick={() => onEscalateAccount(alert.account_id)}
-                    className="py-1.5 px-3 rounded bg-[rgba(245,158,11,0.15)] hover:bg-[rgba(245,158,11,0.3)] border border-[#f59e0b] text-[#f59e0b] text-xs font-mono-data font-semibold transition-colors flex items-center gap-1"
+                    className="py-1.5 px-3 rounded bg-[rgba(168,85,247,0.15)] hover:bg-[rgba(168,85,247,0.3)] border border-[#a855f7] text-[#c084fc] text-xs font-mono-data font-semibold transition-colors flex items-center gap-1"
                     title="Escalate to Tier 2 Forensic Squad"
                   >
                     <ArrowUpRightIcon size={12} />
