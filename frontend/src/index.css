@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #060a12;
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.12) 0%, transparent 40%),
+      radial-gradient(circle at 90% 15%, rgba(139, 92, 246, 0.15) 0%, transparent 45%),
+      radial-gradient(circle at 50% 85%, rgba(244, 63, 94, 0.1) 0%, transparent 50%),
+      linear-gradient(to bottom, rgba(6, 10, 18, 0.82) 0%, rgba(7, 11, 22, 0.88) 100%),
+      url('/background.jpg');
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    @apply text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(11, 19, 41, 0.6);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00f2fe;
+  }
+}
+
+/* Glassmorphic Utilities */
+.glass-panel {
+  background: rgba(11, 19, 41, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+}
+
+.glass-panel-glow {
+  background: rgba(11, 19, 41, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(0, 242, 254, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(0, 242, 254, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px 0 rgba(0, 242, 254, 0.2);
+}
+
+.radar-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+.frost-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.frost-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: 0.75s ease-in-out;
+}
+
+.frost-shine:hover::before {
+  left: 150%;
+}
+
+/* 3D Depth & Hover Effects */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: translateY(-5px) scale(1.012);
+  box-shadow: 0 20px 35px -10px rgba(0, 242, 254, 0.22), 0 0 20px 0 rgba(0, 242, 254, 0.12);
+}
+
+.card-3d-danger:hover {
+  transform: translateY(-5px) scale(1.012);
+  box-shadow: 0 20px 35px -10px rgba(244, 63, 94, 0.25), 0 0 20px 0 rgba(244, 63, 94, 0.15);
+}
+
+/* Streaming Laser Edge Particle Animation */
+@keyframes dashFlow {
+  from {
+    stroke-dashoffset: 32;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.edge-flow-danger {
+  stroke-dasharray: 6 3;
+  animation: dashFlow 0.8s linear infinite;
+}
+
+.edge-flow-normal {
+  stroke-dasharray: 4 4;
+  animation: dashFlow 2.5s linear infinite;
+}
+
+/* 3D Holographic Float */
+@keyframes float3D {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float3D 6s ease-in-out infinite;
+}
+
+/* Dynamic Text Shimmer */
+@keyframes textShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, #38bdf8 0%, #ffffff 40%, #00f2fe 70%, #818cf8 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmer 5s linear infinite;
+}
+
+/* Cyber Matrix Scanline */
+@keyframes cyberScan {
+  0% {
+    top: -10%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+  }
+}
+
+.cyber-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.85), transparent);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.8);
+  animation: cyberScan 6s ease-in-out infinite;
+  pointer-events: none;
+}
