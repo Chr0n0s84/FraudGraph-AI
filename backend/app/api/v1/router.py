@@ -8,6 +8,7 @@ from app.api.v1.cases import router as cases_router
 from app.api.v1.analytics import router as analytics_router
 from app.api.v1.settings import router as settings_router
 from app.api.v1.simulator import router as simulator_router
+from app.api.v1.detection import router as detection_router
 
 api_router = APIRouter()
 
@@ -20,4 +21,4 @@ api_router.include_router(cases_router, prefix="/cases", tags=["Case Management"
 api_router.include_router(analytics_router, prefix="/analytics", tags=["Analytics"])
 api_router.include_router(settings_router, prefix="/settings", tags=["Settings"])
 api_router.include_router(simulator_router, prefix="/simulator", tags=["Simulator"])
-
+api_router.include_router(detection_router, prefix="/detection", tags=["M2 Detection"])

@@ -1,0 +1,6 @@
+transaction_id,timestamp,sender_account,receiver_account,amount,channel
+txn_001,2024-01-01T09:00:00Z,acct_1001,acct_2002,125.50,UPI
+txn_002,2024-01-01T09:07:00Z,acct_2002,acct_3003,80.00,UPI
+txn_003,2024-01-01T09:15:00Z,acct_1001,acct_4004,450.00,card
+txn_004,2024-01-01T09:20:00Z,acct_5005,acct_2002,60.00,bank_transfer
+txn_005,2024-01-01T09:25:00Z,acct_1001,acct_3003,220.00,UPI
