@@ -138,7 +138,17 @@ def score_account(account_id):
     ]
 
     if account_scores.empty:
-        raise ValueError(f"Account not found or has no transactions: {account_id}")
+        if str(account_id) not in get_all_account_ids():
+            raise ValueError(f"Account not found: {account_id}")
+
+        return {
+            "account_id": str(account_id),
+            "score": 0,
+            "level": "LOW",
+            "reasons": [],
+            "age_days": get_account_age_days(account_id),
+            "counterparties": 0,
+        }
 
     result = account_scores.iloc[0]
 
