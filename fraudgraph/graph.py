@@ -17,14 +17,32 @@ def build_transaction_graph(transactions):
         graph.add_node(sender, account_id=sender)
         graph.add_node(receiver, account_id=receiver)
 
-        graph.add_edge(
-            sender,
-            receiver,
-            transaction_id=row["transaction_id"],
-            amount=float(row["amount"]),
-            channel=row["channel"],
-            timestamp=row["timestamp"]
-        )
+        amount = float(row["amount"])
+        transaction = {
+            "transaction_id": row["transaction_id"],
+            "amount": amount,
+            "channel": row["channel"],
+            "timestamp": row["timestamp"]
+        }
+
+        if graph.has_edge(sender, receiver):
+            edge = graph[sender][receiver]
+            edge["transaction_count"] += 1
+            edge["total_amount"] += amount
+            edge["amount"] = edge["total_amount"]
+            edge["transactions"].append(transaction)
+        else:
+            graph.add_edge(
+                sender,
+                receiver,
+                transaction_id=row["transaction_id"],
+                amount=amount,
+                total_amount=amount,
+                transaction_count=1,
+                channel=row["channel"],
+                timestamp=row["timestamp"],
+                transactions=[transaction]
+            )
 
     return graph
 

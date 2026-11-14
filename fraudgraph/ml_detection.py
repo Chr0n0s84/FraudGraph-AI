@@ -12,6 +12,12 @@ def build_ml_features(transactions: pd.DataFrame):
 
     df = transactions.copy()
 
+    # Accept both the original and normalized ingestion column names.
+    if "sender_account" not in df.columns and "sender_id" in df.columns:
+        df["sender_account"] = df["sender_id"]
+    if "receiver_account" not in df.columns and "receiver_id" in df.columns:
+        df["receiver_account"] = df["receiver_id"]
+
     df["timestamp"] = pd.to_datetime(
         df["timestamp"],
         utc=True,
@@ -106,28 +112,25 @@ def build_ml_features(transactions: pd.DataFrame):
 
 
 def detect_anomalies(transactions: pd.DataFrame):
+    """Fit Isolation Forest and return transaction-level anomaly scores."""
 
-    _, X = build_ml_features(transactions)
+    df, X = build_ml_features(transactions)
 
-    expected_fraction = 60 / 1060
+    if len(df) < 2:
+        raise ValueError("At least two valid transactions are required.")
 
     model = IsolationForest(
         n_estimators=200,
-        contamination=cast(Any, expected_fraction),
+        contamination="auto",
         random_state=42,
     )
-
     model.fit(X)
 
-    predictions = model.predict(X)
-    anomaly_scores = -model.decision_function(X)
+    # Higher percentile means more anomalous.
+    raw_scores = -model.decision_function(X)
+    percentile_scores = pd.Series(raw_scores).rank(pct=True) * 100
 
-    df = transactions.copy()
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
-    df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
-    df = df.dropna(subset=["timestamp", "amount", "sender_account", "receiver_account"]).copy()
-    df["anomaly_prediction"] = (predictions == -1).astype(int)
-    df["anomaly_score"] = anomaly_scores
-    df = df.sort_values("anomaly_score", ascending=False)
+    df["anomaly_prediction"] = (model.predict(X) == -1).astype(int)
+    df["anomaly_score"] = percentile_scores.to_numpy()
 
-    return df, model
+    return df.sort_values("anomaly_score", ascending=False), model
